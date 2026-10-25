@@ -27,7 +27,7 @@ export class AIRouter {
       this.openai = new OpenAIProvider(config.openaiApiKey, config.openaiModel || 'gpt-4o');
     }
     if (config.geminiApiKey) {
-      this.gemini = new GeminiProvider(config.geminiApiKey, config.geminiModel || 'gemini-1.5-flash');
+      this.gemini = new GeminiProvider(config.geminiApiKey, config.geminiModel || 'gemini-flash-latest');
     }
   }
 

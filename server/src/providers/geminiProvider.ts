@@ -6,18 +6,28 @@ export class GeminiProvider {
   private apiKey: string;
   public defaultModel: string;
 
-  constructor(apiKey: string, defaultModel = 'gemini-1.5-flash') {
+  constructor(apiKey: string, defaultModel = 'gemini-flash-latest') {
     if (!apiKey) {
       throw new Error('Gemini API key is required.');
     }
     this.apiKey = apiKey;
-    this.defaultModel = defaultModel;
+    this.defaultModel = this.resolveModelName(defaultModel);
     this.genAI = new GoogleGenerativeAI(this.apiKey);
+  }
+
+  private resolveModelName(model?: string): string {
+    if (!model) return 'gemini-flash-latest';
+    // Automatically map deprecated or unavailable models to active Gemini models
+    if (/gemini-1\.5|gemini-2\.0|gemini-2\.5-flash$/i.test(model)) {
+      return 'gemini-flash-latest';
+    }
+    return model;
   }
 
   async testConnection(): Promise<TestResult> {
     try {
-      const model = this.genAI.getGenerativeModel({ model: this.defaultModel });
+      const targetModel = this.resolveModelName(this.defaultModel);
+      const model = this.genAI.getGenerativeModel({ model: targetModel });
       const result = await model.generateContent({
         contents: [{ role: 'user', parts: [{ text: 'Respond with "OK" if connected.' }] }],
         generationConfig: { maxOutputTokens: 10 }
@@ -28,7 +38,7 @@ export class GeminiProvider {
         provider: 'gemini',
         success: true,
         message: 'Google Gemini connection verified successfully.',
-        availableModels: ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.0-flash-exp']
+        availableModels: ['gemini-flash-latest', 'gemini-pro-latest', 'gemini-2.5-flash-lite']
       };
     } catch (err: any) {
       const isAuth = GeminiProvider.isAuthError(err);
@@ -47,8 +57,7 @@ export class GeminiProvider {
     }
   }
 
-  async generateText(options: TextGenerationOptions, modelOverride?: string): Promise<string> {
-    const modelName = modelOverride || this.defaultModel;
+  private async executeGenerateText(modelName: string, options: TextGenerationOptions): Promise<string> {
     const model = this.genAI.getGenerativeModel({
       model: modelName,
       systemInstruction: options.systemPrompt
@@ -76,6 +85,20 @@ export class GeminiProvider {
     }
 
     return text;
+  }
+
+  async generateText(options: TextGenerationOptions, modelOverride?: string): Promise<string> {
+    const primaryTarget = this.resolveModelName(modelOverride || this.defaultModel);
+    try {
+      return await this.executeGenerateText(primaryTarget, options);
+    } catch (err: any) {
+      // Auto-fallback if specific model is deprecated or unavailable
+      if ((err.status === 404 || /not found|no longer available/i.test(err.message)) && primaryTarget !== 'gemini-flash-latest') {
+        console.warn(`Gemini model ${primaryTarget} unavailable, falling back to gemini-flash-latest`);
+        return await this.executeGenerateText('gemini-flash-latest', options);
+      }
+      throw err;
+    }
   }
 
   async generateImage(options: ImagePromptOptions): Promise<{ url: string }> {

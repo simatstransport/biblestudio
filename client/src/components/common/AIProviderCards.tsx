@@ -39,7 +39,7 @@ export const AIProviderCards: React.FC<AIProviderCardsProps> = ({
   // Gemini Form State
   const [geminiKey, setGeminiKey] = useState('');
   const [showGeminiKey, setShowGeminiKey] = useState(false);
-  const [geminiModel, setGeminiModel] = useState(settings?.gemini?.model || 'gemini-1.5-flash');
+  const [geminiModel, setGeminiModel] = useState(settings?.gemini?.model || 'gemini-flash-latest');
   const [geminiTesting, setGeminiTesting] = useState(false);
   const [geminiTestResult, setGeminiTestResult] = useState<{ success: boolean; message: string } | null>(null);
   const [geminiHelpOpen, setGeminiHelpOpen] = useState(false);
@@ -395,9 +395,9 @@ export const AIProviderCards: React.FC<AIProviderCardsProps> = ({
                   onChange={(e) => setGeminiModel(e.target.value)}
                   className="w-full bg-navy-950 border border-navy-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-gold-500"
                 >
-                  <option value="gemini-1.5-flash">gemini-1.5-flash (Lightning Fast & Generous Free Tier)</option>
-                  <option value="gemini-1.5-pro">gemini-1.5-pro (Deep Reasoning & Multimodal)</option>
-                  <option value="gemini-2.0-flash-exp">gemini-2.0-flash-exp</option>
+                  <option value="gemini-flash-latest">gemini-flash-latest (Lightning Fast & Generous Free Tier)</option>
+                  <option value="gemini-pro-latest">gemini-1.5-pro (Deep Reasoning & Multimodal)</option>
+                  <option value="gemini-2.5-flash-lite">gemini-2.0-flash-exp</option>
                 </select>
               </div>
 

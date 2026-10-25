@@ -81,7 +81,7 @@ aiSettingsRouter.get('/', requireAuth, async (req: Request, res: Response, next:
       gemini: {
         configured: hasGemini,
         maskedKey: geminiMasked,
-        model: settings?.gemini_model || 'gemini-1.5-flash',
+        model: settings?.gemini_model || 'gemini-flash-latest',
         status: settings?.gemini_status || (hasGemini ? 'connected' : 'unconfigured')
       },
       primaryProvider: settings?.primary_provider || 'openai',

@@ -6,7 +6,7 @@ export const aiSettingsSchema = z.object({
   primaryProvider: z.enum(['openai', 'gemini']).default('openai'),
   fallbackProvider: z.enum(['openai', 'gemini', 'none']).default('gemini'),
   openaiModel: z.string().default('gpt-4o'),
-  geminiModel: z.string().default('gemini-1.5-flash')
+  geminiModel: z.string().default('gemini-flash-latest')
 });
 
 export const testProviderSchema = z.object({
