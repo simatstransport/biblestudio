@@ -3,6 +3,8 @@ import { requireAuth } from '../middleware/auth.js';
 import { InstagramService } from '../services/instagramService.js';
 import { getSupabaseAdmin } from '../services/supabaseService.js';
 import { config } from '../config/index.js';
+import { getUserSettings } from './aiSettings.js';
+import { decryptSecret } from '../security/encryption.js';
 
 export const instagramRouter = Router();
 
@@ -11,8 +13,22 @@ instagramRouter.post('/publish-custom', requireAuth, async (req: Request, res: R
   try {
     let { imageUrl, caption, igUserId, accessToken } = req.body;
 
-    igUserId = igUserId || process.env.INSTAGRAM_USER_ID;
-    accessToken = accessToken || process.env.INSTAGRAM_ACCESS_TOKEN;
+    igUserId = igUserId || process.env.INSTAGRAM_USER_ID || config.instagram?.userId;
+    accessToken = accessToken || process.env.INSTAGRAM_ACCESS_TOKEN || config.instagram?.accessToken;
+
+    if (!accessToken && req.user?.id) {
+      try {
+        const userSettings = await getUserSettings(req.user.id);
+        if (userSettings?.encrypted_instagram_token) {
+          accessToken = decryptSecret(userSettings.encrypted_instagram_token);
+        }
+        if (userSettings?.instagram_user_id) {
+          igUserId = userSettings.instagram_user_id;
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
 
     if (!imageUrl) {
       return res.status(400).json({ error: 'Image URL is required' });
@@ -21,7 +37,7 @@ instagramRouter.post('/publish-custom', requireAuth, async (req: Request, res: R
     if (!igUserId || !accessToken) {
       return res.status(400).json({
         error: 'Instagram account not configured',
-        message: 'INSTAGRAM_USER_ID and INSTAGRAM_ACCESS_TOKEN must be configured in environment or provided in request.'
+        message: 'INSTAGRAM_USER_ID and INSTAGRAM_ACCESS_TOKEN must be added in Vercel Environment Variables (or server .env) to enable publishing to @creationbibleverse.'
       });
     }
 
@@ -75,8 +91,8 @@ instagramRouter.post('/publish-custom', requireAuth, async (req: Request, res: R
 // POST /api/instagram/trigger-daily (Scheduled or Manual Daily Post Trigger)
 instagramRouter.post('/trigger-daily', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const igUserId = req.body.igUserId || process.env.INSTAGRAM_USER_ID;
-    const accessToken = req.body.accessToken || process.env.INSTAGRAM_ACCESS_TOKEN;
+    const igUserId = req.body.igUserId || process.env.INSTAGRAM_USER_ID || config.instagram?.userId;
+    const accessToken = req.body.accessToken || process.env.INSTAGRAM_ACCESS_TOKEN || config.instagram?.accessToken;
     const cronSecret = req.headers['x-cron-secret'] || req.query.secret;
 
     if (process.env.CRON_SECRET && cronSecret !== process.env.CRON_SECRET) {

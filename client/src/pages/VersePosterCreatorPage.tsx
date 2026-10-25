@@ -29,10 +29,10 @@ export const VersePosterCreatorPage: React.FC = () => {
   const [verseReference, setVerseReference] = useState('1 Kings 8:15');
   const [verseText, setVerseText] = useState('Blessed be the LORD God of Israel, which spake with his mouth unto David my father, and hath with his hand fulfilled it, saying,');
   const [language, setLanguage] = useState<'english' | 'tamil' | 'bilingual'>('english');
-  const [purposeOrTheme, setPurposeOrTheme] = useState("God's faithfulness, intimate comfort, and divine fulfillment");
+  const [purposeOrTheme, setPurposeOrTheme] = useState('');
   const [translation, setTranslation] = useState('King James Version (KJV)');
-  const [atmosphere, setAtmosphere] = useState('Warm, peaceful, intimate divine presence, golden hour glow');
-  const [visualPreferences, setVisualPreferences] = useState('Jesus embracing a young believer tenderly with golden backlight');
+  const [atmosphere, setAtmosphere] = useState('');
+  const [visualPreferences, setVisualPreferences] = useState('');
   const [additionalCaption, setAdditionalCaption] = useState('');
   const [aspectRatio, setAspectRatio] = useState<'4:5' | '1:1' | '9:16'>('4:5');
 
@@ -86,6 +86,13 @@ export const VersePosterCreatorPage: React.FC = () => {
         } else {
           setVerseText(res.data.english.text);
         }
+        if (res.data.topic) {
+          setPurposeOrTheme(res.data.topic.charAt(0).toUpperCase() + res.data.topic.slice(1));
+        } else {
+          setPurposeOrTheme('');
+        }
+        setAtmosphere('');
+        setVisualPreferences('');
       } else {
         alert('Could not find canonical verse matching that reference. You can type or paste the exact verse text below.');
       }
@@ -348,13 +355,13 @@ export const VersePosterCreatorPage: React.FC = () => {
               {/* Devotional Purpose or Theme */}
               <div>
                 <label className="block text-xs font-semibold text-slate-200 mb-1">
-                  Devotional Purpose or Theme <span className="text-red-400">*</span>
+                  Devotional Purpose or Theme <span className="text-slate-500 font-normal">(Optional)</span>
                 </label>
                 <input
                   type="text"
                   value={purposeOrTheme}
                   onChange={(e) => setPurposeOrTheme(e.target.value)}
-                  placeholder="e.g. Daily encouragement, Thanksgiving sermon, Intimate comfort"
+                  placeholder="e.g. God's faithfulness, intimate comfort, victory (Leave blank for AI auto-deduction)"
                   className="w-full bg-navy-950 border border-navy-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500"
                 />
               </div>
@@ -386,32 +393,45 @@ export const VersePosterCreatorPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Optional Nuances (Collapsible) */}
+            {/* Optional Creative Nuances */}
             <div className="bg-navy-900 border border-navy-800 rounded-2xl p-5 shadow-xl space-y-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-300 block pb-1 border-b border-navy-800">
-                Optional Creative Nuances
-              </span>
+              <div className="flex items-center justify-between pb-1 border-b border-navy-800">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                  Optional Creative Nuances
+                </span>
+                <span className="text-[10px] text-gold-400 font-medium">
+                  Auto-adapts to each verse
+                </span>
+              </div>
+
+              <p className="text-[11px] text-slate-400 leading-relaxed">
+                Leave these empty to let AI autonomously analyze the scripture to determine the most fitting atmosphere and visual subject.
+              </p>
 
               <div className="space-y-3 pt-1">
                 <div>
-                  <label className="block text-[11px] text-slate-400 mb-1">Desired Emotional Atmosphere (Optional)</label>
+                  <label className="block text-[11px] text-slate-300 mb-1">
+                    Desired Emotional Atmosphere <span className="text-slate-500 font-normal">(Optional)</span>
+                  </label>
                   <input
                     type="text"
                     value={atmosphere}
                     onChange={(e) => setAtmosphere(e.target.value)}
-                    placeholder="e.g. Warm golden hour, comforting, solemn, celestial majesty"
-                    className="w-full bg-navy-950 border border-navy-700 rounded-xl px-3 py-1.5 text-xs text-white"
+                    placeholder="Leave blank for AI auto-deduction (e.g. peaceful, majestic, reverent, comforting)"
+                    className="w-full bg-navy-950 border border-navy-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] text-slate-400 mb-1">Visual Concept Preferences (Optional)</label>
+                  <label className="block text-[11px] text-slate-300 mb-1">
+                    Visual Concept Preferences <span className="text-slate-500 font-normal">(Optional)</span>
+                  </label>
                   <input
                     type="text"
                     value={visualPreferences}
                     onChange={(e) => setVisualPreferences(e.target.value)}
-                    placeholder="e.g. Jesus embracing believer, temple pillars, open Bible with heavenly rays"
-                    className="w-full bg-navy-950 border border-navy-700 rounded-xl px-3 py-1.5 text-xs text-white"
+                    placeholder="Leave blank for AI auto-deduction (e.g. Good Shepherd, Temple, Sea of Galilee, Mount Sinai)"
+                    className="w-full bg-navy-950 border border-navy-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold-500"
                   />
                 </div>
               </div>

@@ -26,5 +26,9 @@ export const config = {
   defaults: {
     openaiApiKey: process.env.DEFAULT_OPENAI_API_KEY || '',
     geminiApiKey: process.env.DEFAULT_GEMINI_API_KEY || '',
+  },
+  instagram: {
+    userId: process.env.INSTAGRAM_USER_ID || '17841469954164282',
+    accessToken: process.env.INSTAGRAM_ACCESS_TOKEN || '',
   }
 };

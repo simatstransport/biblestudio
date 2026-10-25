@@ -288,12 +288,22 @@ generateRouter.post('/poster-ai', requireAuth, async (req: Request, res: Respons
     // 1. Creative Reasoning & Structured Design Brief via Gemini / OpenAI
     const systemPrompt = `You are an elite Christian Creative Director, Theological Scholar, and Art Director.
 Analyze the user's Bible scripture, purpose, and atmosphere.
-Synthesize a breathtaking, photorealistic visual concept that emotionally and spiritually embodies the scripture.
-Determine the subject (e.g. Jesus Christ tenderly comforting, ancient temple with heavenly rays, peaceful still waters, Mount Sinai sunrise, prayerful believer).
-CRITICAL: Design the composition with deliberate, high-contrast NEGATIVE SPACE (shadowed atmospheric area, dark vignette, or deep tones) where scripture typography can be rendered with crystal-clear readability.
+
+CRITICAL DYNAMIC CREATIVE DIRECTIVE:
+You MUST synthesize a visual concept, subject, atmosphere, and color palette that dynamically and authentically reflects THIS SPECIFIC SCRIPTURE (${input.verseReference}).
+- DO NOT default to a repetitive subject (such as a generic embrace or temple) unless the scripture explicitly warrants it.
+- Adapt the scene directly to the theological context and imagery:
+  * If the scripture speaks of the Shepherd or peace (e.g. Psalm 23): depict green pastures, tranquil still waters, a caring shepherd watching his flock under dawn light.
+  * If the scripture speaks of the Temple, covenant, or prayer of dedication (e.g. 1 Kings 8, 2 Chronicles): depict Solomon's ancient temple with golden stone pillars, incense mist, and volumetric celestial light beams.
+  * If the scripture speaks of faith in storms or walking on water (e.g. Matthew 14): depict the Galilean sea with a loving divine hand breaking through dark waves.
+  * If the scripture speaks of the Cross, salvation, grace, or love (e.g. John 3:16, Romans 5): depict Mount Calvary with the holy cross silhouetted against a radiant sunrise.
+  * If the scripture speaks of God's power, mountains, or victory (e.g. Isaiah, Joshua, Psalms): depict majestic mountains with parted clouds and divine golden rim lighting.
+  * If the scripture speaks of solitude or earnest prayer: depict an ancient olive grove (Gethsemane) or prayerful believer in soft warm light.
+- If the user has left "atmosphere" or "visualPreferences" blank, use your spiritual insight to select the most awe-inspiring and spiritually uplifting subject and atmosphere suited to the text.
+- CRITICAL: Design the composition with deliberate, high-contrast NEGATIVE SPACE (shadowed atmospheric area, dark vignette, or deep tones) where scripture typography can be rendered with crystal-clear readability.
 Respond with pure JSON only matching this schema:
 {
-  "visualConcept": "Brief 1-2 sentence description of the visual scene",
+  "visualConcept": "Brief 1-2 sentence description of the visual scene uniquely matching this scripture",
   "subject": "Main subject description",
   "atmosphere": "Emotional atmosphere and mood",
   "lighting": "Cinematic lighting details (e.g. contre-jour golden rim lighting, 2800K warm tones, volumetric dust rays)",
@@ -305,23 +315,23 @@ Respond with pure JSON only matching this schema:
     "accent": "#D4AF37",
     "scrimColor": "rgba(5, 11, 24, 0.85)"
   },
-  "topHook": "Short compelling 2-4 word hook (e.g. 'I know you' or 'Faithful & True')",
-  "subtitleHook": "Optional cursive script accent phrase (e.g. 'always with me' or 'His hand fulfilled it')",
+  "topHook": "Short compelling 2-4 word hook (e.g. He Leads Me or Faithful and True)",
+  "subtitleHook": "Optional cursive script accent phrase",
   "highlightPhrase": "Exact 3-6 words from the verse text to emphasize in glowing gold",
   "dividerSymbol": "—  ✝  —",
   "imagePrompt": "Detailed 8K photorealistic image-generation prompt for DALL-E 3 / Imagen. Emphasize cinematic lighting, photorealism, textures, Rembrandt lighting, and pure scenery with ABSOLUTELY ZERO TEXT, NO LETTERS, NO WORDS, NO WATERMARKS.",
   "devotionalCaption": "Inspiring 2-sentence devotional reflection for social media",
   "hashtags": ["#Faith", "#BibleVerse", "#Scripture"],
-  "designRationale": "Why this composition, visual subject, and typography placement were selected"
+  "designRationale": "Why this composition, visual subject, and typography placement were selected for this specific scripture"
 }`;
 
     const userPrompt = `Scripture Reference: ${input.verseReference}
 Verse Text: "${input.verseText}"
 Language Mode: ${input.language}
-Poster Purpose: ${input.purposeOrTheme}
+Poster Purpose: ${input.purposeOrTheme || 'Auto-deduced from scripture context'}
 Preferred Translation: ${input.translation || 'Canonical'}
-Desired Atmosphere: ${input.atmosphere || 'Heavenly, comforting and awe-inspiring'}
-Visual Preferences: ${input.visualPreferences || 'Biblical authenticity, dramatic lighting'}
+Desired Atmosphere: ${input.atmosphere || 'Autonomously deduce the most fitting, awe-inspiring atmosphere from the verse context'}
+Visual Preferences: ${input.visualPreferences || 'Autonomously select the most authentic biblical scene uniquely suited to this verse'}
 Additional Caption Request: ${input.additionalCaption || 'None'}`;
 
     const briefResult = await router.generateText({
