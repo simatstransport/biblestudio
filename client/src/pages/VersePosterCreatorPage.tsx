@@ -15,7 +15,8 @@ import {
   Wand2,
   Image as ImageIcon,
   Check,
-  Flame
+  Flame,
+  Heart
 } from 'lucide-react';
 import { Navbar } from '../components/layout/Navbar.js';
 import { CanvasPreview } from '../components/editor/CanvasPreview.js';
@@ -25,12 +26,14 @@ import { PairedVerse, TextOverlay } from '../types/index.js';
 export const VersePosterCreatorPage: React.FC = () => {
   // Option Mode: 'english' | 'tamil' | 'bilingual'
   const [posterMode, setPosterMode] = useState<'english' | 'tamil' | 'bilingual'>('bilingual');
+  const [layoutStyle, setLayoutStyle] = useState<'classic_centered' | 'intimate_embrace'>('classic_centered');
   const [aspectRatio, setAspectRatio] = useState<'4:5' | '1:1' | '9:16'>('4:5');
   const [selectedTopic, setSelectedTopic] = useState('faith');
 
-  // Top Header
+  // Top Header / Hook
   const [showHeader, setShowHeader] = useState(true);
   const [headerText, setHeaderText] = useState('— HOLY BIBLE VERSE —');
+  const [subtitleHook, setSubtitleHook] = useState('always with me');
 
   // Active Scripture Content
   const [currentVerse, setCurrentVerse] = useState<PairedVerse | null>(null);
@@ -48,7 +51,7 @@ export const VersePosterCreatorPage: React.FC = () => {
 
   // AI DALL-E 3 Image Generator
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
-  const [aiPrompt, setAiPrompt] = useState('King Solomon holy temple with towering stone pillars, heavenly golden rays of light pouring from above, ancient golden crown on royal blue velvet cloth');
+  const [aiPrompt, setAiPrompt] = useState('Photorealistic 8K cinematic photograph of Jesus Christ with a gentle, loving expression in a textured linen tunic, tenderly embracing a young believer from behind, resting His head close with deep comfort. Golden hour sunset rim-lighting from upper left, dark chiaroscuro shadows on the right with negative space for text overlays, 8k');
   const [showAIPanel, setShowAIPanel] = useState(false);
 
   // AI Devotional Caption
@@ -57,23 +60,37 @@ export const VersePosterCreatorPage: React.FC = () => {
   const [isGeneratingCaption, setIsGeneratingCaption] = useState(false);
   const [copiedCaption, setCopiedCaption] = useState(false);
 
-  // Load sample verse by default or keep Solomon 8:15
-  useEffect(() => {
-    // defaults are already set to Solomon's temple sample
-  }, []);
-
+  // Sample 1: King Solomon Temple
   const loadSolomonSample = () => {
+    setLayoutStyle('classic_centered');
     setPosterMode('bilingual');
     setBgPreset('solomon_temple');
     setCustomBgUrl(null);
     setShowHeader(true);
     setHeaderText('— HOLY BIBLE VERSE —');
+    setSubtitleHook('');
     setEnglishHighlight('BLESSED BE THE LORD GOD OF ISRAEL');
     setEnglishText(', which spake with his mouth unto David my father, and hath with his hand fulfilled it, saying,');
     setDividerText('—  ❖  ⚜  ❖  —');
     setTamilHighlight('இஸ்ரவேலின் தேவனாகிய கர்த்தருக்கு ஸ்தோத்திரம்;');
     setTamilText(' அவர் என் தகப்பனாகிய தாவீதோடே தம்முடைய வாயினால் சொன்னதை, தம்முடைய கையினால் நிறைவேற்றினார்; அவர் சொன்னது என்னவென்றால்:');
     setDualReference('1 KINGS 8:15  |  1 இராஜாக்கள் 8:15');
+    setIsVerified(true);
+  };
+
+  // Sample 2: Intimate Jesus Embrace (The newly uploaded style)
+  const loadJesusEmbraceSample = () => {
+    setLayoutStyle('intimate_embrace');
+    setPosterMode('english');
+    setBgPreset('jesus_embrace');
+    setCustomBgUrl(null);
+    setShowHeader(true);
+    setHeaderText('I know you');
+    setSubtitleHook('always with me');
+    setEnglishHighlight('Blessed be the LORD\nGod of Israel,');
+    setEnglishText('which spake with his mouth\nunto David my father,\nand hath with his hand\nfulfilled it, saying,');
+    setDividerText('—  ✝  —');
+    setDualReference('1 KINGS 8:15');
     setIsVerified(true);
   };
 
@@ -152,7 +169,7 @@ export const VersePosterCreatorPage: React.FC = () => {
         setBgPreset('custom');
         alert('✨ DALL-E 3 Photorealistic Biblical background generated and applied!');
       } else if (res.presetFallback) {
-        setBgPreset(res.preset || 'solomon_temple');
+        setBgPreset(res.preset || 'jesus_embrace');
         setCustomBgUrl(null);
         alert('Studio preset background applied: ' + (res.message || 'Ready!'));
       }
@@ -163,11 +180,137 @@ export const VersePosterCreatorPage: React.FC = () => {
     }
   };
 
-  // Build Dynamic Typography Layers matching the exact Sample Poster Hierarchy
+  // Build Dynamic Typography Layers based on Layout Style and Language Mode
   const buildTextOverlays = (): TextOverlay[] => {
     const overlays: TextOverlay[] = [];
 
-    // 1. Top Header: — HOLY BIBLE VERSE —
+    // STYLE 2: INTIMATE EMBRACE (Right-Side Negative Space Layout)
+    if (layoutStyle === 'intimate_embrace') {
+      // 1. Top Hook Roman Gold Serif
+      if (showHeader && headerText.trim()) {
+        overlays.push({
+          id: 'embrace_hook1',
+          text: headerText,
+          x: 74,
+          y: 14,
+          fontSize: 34,
+          fontFamily: "'Cinzel', Georgia, serif",
+          color: '#E6CA65',
+          fontWeight: '800',
+          align: 'center',
+          shadow: true
+        });
+      }
+
+      // 2. Flowing Cursive Script Accent
+      if (subtitleHook.trim()) {
+        overlays.push({
+          id: 'embrace_hook2',
+          text: subtitleHook,
+          x: 74,
+          y: 20,
+          fontSize: 24,
+          fontFamily: "'Brush Script MT', 'Dancing Script', 'Playfair Display', cursive, serif",
+          color: '#FFFFFF',
+          fontWeight: '400',
+          align: 'center',
+          shadow: true
+        });
+      }
+
+      // 3. Subtle Underline Swoosh
+      overlays.push({
+        id: 'embrace_swoosh',
+        text: '⎯⎯⎯⎯⎯⎯',
+        x: 74,
+        y: 23,
+        fontSize: 14,
+        fontFamily: "'Inter', sans-serif",
+        color: '#D4AF37',
+        fontWeight: 'bold',
+        align: 'center',
+        shadow: true
+      });
+
+      // 4. Lead text
+      overlays.push({
+        id: 'embrace_lead',
+        text: 'And he said,',
+        x: 74,
+        y: 52,
+        fontSize: 18,
+        fontFamily: "'Cinzel', Georgia, serif",
+        color: '#FFFFFF',
+        fontWeight: '500',
+        align: 'center',
+        shadow: true
+      });
+
+      // 5. Golden Highlight Phrase
+      if (englishHighlight.trim()) {
+        overlays.push({
+          id: 'embrace_highlight',
+          text: englishHighlight,
+          x: 74,
+          y: 56,
+          fontSize: 21,
+          fontFamily: "'Cinzel', Georgia, serif",
+          color: '#E6CA65',
+          fontWeight: '800',
+          align: 'center',
+          shadow: true
+        });
+      }
+
+      // 6. Scripture Body
+      overlays.push({
+        id: 'embrace_body',
+        text: englishText.trim(),
+        x: 74,
+        y: 65,
+        fontSize: 17,
+        fontFamily: "'Cinzel', Georgia, serif",
+        color: '#FFFFFF',
+        fontWeight: '500',
+        align: 'center',
+        shadow: true
+      });
+
+      // 7. Divider: Cross
+      if (dividerText.trim()) {
+        overlays.push({
+          id: 'embrace_divider',
+          text: dividerText,
+          x: 74,
+          y: 77,
+          fontSize: 16,
+          fontFamily: "'Inter', sans-serif",
+          color: '#D4AF37',
+          fontWeight: 'bold',
+          align: 'center',
+          shadow: true
+        });
+      }
+
+      // 8. Reference
+      overlays.push({
+        id: 'embrace_ref',
+        text: dualReference.includes('|') ? dualReference.split('|')[0].trim() : dualReference,
+        x: 74,
+        y: 82,
+        fontSize: 18,
+        fontFamily: "'Cinzel', 'Inter', sans-serif",
+        color: '#E6CA65',
+        fontWeight: '800',
+        align: 'center',
+        shadow: true,
+        letterSpacing: 2
+      });
+
+      return overlays;
+    }
+
+    // STYLE 1: CLASSIC CENTERED (Full-Width / Solomon Temple Layout)
     if (showHeader && headerText.trim()) {
       overlays.push({
         id: 'header',
@@ -185,7 +328,6 @@ export const VersePosterCreatorPage: React.FC = () => {
     }
 
     if (posterMode === 'english') {
-      // Option A: English Only
       if (englishHighlight.trim()) {
         overlays.push({
           id: 'eng_highlight',
@@ -243,7 +385,6 @@ export const VersePosterCreatorPage: React.FC = () => {
       });
 
     } else if (posterMode === 'tamil') {
-      // Option B: Tamil Only
       if (tamilHighlight.trim()) {
         overlays.push({
           id: 'tam_highlight',
@@ -301,7 +442,7 @@ export const VersePosterCreatorPage: React.FC = () => {
       });
 
     } else {
-      // Option C: Combined English + Tamil (Sample Exact Structure)
+      // Bilingual English + Tamil
       if (englishHighlight.trim()) {
         overlays.push({
           id: 'eng_highlight',
@@ -330,7 +471,6 @@ export const VersePosterCreatorPage: React.FC = () => {
         shadow: true
       });
 
-      // Ornate central filigree divider
       if (dividerText.trim()) {
         overlays.push({
           id: 'divider',
@@ -374,7 +514,6 @@ export const VersePosterCreatorPage: React.FC = () => {
         shadow: true
       });
 
-      // Dual Reference
       overlays.push({
         id: 'ref',
         text: dualReference,
@@ -409,6 +548,8 @@ export const VersePosterCreatorPage: React.FC = () => {
           dividerText,
           showHeader,
           headerText,
+          subtitleHook,
+          layoutStyle,
           topic: selectedTopic,
           posterMode
         },
@@ -445,11 +586,11 @@ export const VersePosterCreatorPage: React.FC = () => {
   ];
 
   const aiPresets = [
-    { label: "Solomon's Temple & God Rays", prompt: "King Solomon holy temple with towering stone pillars, heavenly golden rays of light pouring from above, ancient golden crown on royal blue velvet cloth, cinematic 8k" },
-    { label: "Mount Sinai Sunset & Tablets", prompt: "Mount Sinai at sunset with burning golden clouds, sacred mountain peak, rays of divine light, ancient biblical atmosphere, photorealistic" },
-    { label: "Gethsemane Olive Trees", prompt: "Garden of Gethsemane ancient olive trees with peaceful golden morning light and heavenly misty atmosphere, 8K hyper-detailed" },
-    { label: "Heavenly Throne Room", prompt: "Celestial heavenly palace hall with glowing golden light rays, crystal floor reflections, majestic divine presence, pure majestic scene" },
-    { label: "Starry Bethlehem Night", prompt: "Deep night sky over ancient Bethlehem hills with a radiant glorious Bethlehem star casting heavenly beam to the ground, photorealistic 8K" }
+    { label: "🕊 Jesus Embrace & Golden Glow", prompt: "Photorealistic 8K cinematic photograph of Jesus Christ with a gentle, loving expression in a textured linen tunic, tenderly embracing a young believer from behind, resting His head close with deep comfort and compassion. Intense golden hour sunset rim-lighting from the upper left casting a warm heavenly glow and halo on their hair and silhouettes. Deep dark moody chiaroscuro atmospheric shadows occupying the entire right side of the frame with spacious negative space for text overlays. Golden volumetric dust motes, warm 2800K cinematic color grading, hyper-detailed, Rembrandt lighting, zero text, no letters, no words, no watermarks, vertical 4:5 aspect ratio." },
+    { label: "👑 Solomon's Temple & God Rays", prompt: "King Solomon holy temple with towering stone pillars, heavenly golden rays of light pouring from above, ancient golden crown on royal blue velvet cloth, cinematic 8k" },
+    { label: "🌄 Mount Sinai Sunset & Tablets", prompt: "Mount Sinai at sunset with burning golden clouds, sacred mountain peak, rays of divine light, ancient biblical atmosphere, photorealistic" },
+    { label: "🌿 Gethsemane Olive Trees", prompt: "Garden of Gethsemane ancient olive trees with peaceful golden morning light and heavenly misty atmosphere, 8K hyper-detailed" },
+    { label: "✨ Heavenly Throne Room", prompt: "Celestial heavenly palace hall with glowing golden light rays, crystal floor reflections, majestic divine presence, pure majestic scene" },
   ];
 
   return (
@@ -471,21 +612,38 @@ export const VersePosterCreatorPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex items-center space-x-3">
+          {/* Quick Style Switchers */}
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={loadJesusEmbraceSample}
+              className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-md ${
+                bgPreset === 'jesus_embrace'
+                  ? 'bg-gold-500/25 border-gold-400 text-gold-300 ring-1 ring-gold-400'
+                  : 'bg-navy-900 border-navy-700 text-slate-300 hover:border-gold-500'
+              }`}
+            >
+              <Heart className="w-3.5 h-3.5 text-gold-400" />
+              <span>🕊 Jesus' Embrace Style</span>
+            </button>
+
             <button
               onClick={loadSolomonSample}
-              className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-gold-500/15 border border-gold-500/40 text-gold-300 hover:bg-gold-500/25 transition-all cursor-pointer shadow-md"
+              className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-md ${
+                bgPreset === 'solomon_temple'
+                  ? 'bg-gold-500/25 border-gold-400 text-gold-300 ring-1 ring-gold-400'
+                  : 'bg-navy-900 border-navy-700 text-slate-300 hover:border-gold-500'
+              }`}
             >
-              <Sparkles className="w-4 h-4 text-gold-400" />
-              <span>Load Sample Poster Style</span>
+              <Sparkles className="w-3.5 h-3.5 text-gold-400" />
+              <span>👑 Solomon Temple Style</span>
             </button>
 
             <button
               onClick={handleSaveDraft}
-              className="flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-navy-900 border border-navy-700 hover:border-gold-500 text-slate-200 transition-colors cursor-pointer"
+              className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-navy-900 border border-navy-700 hover:border-gold-500 text-slate-200 transition-colors cursor-pointer"
             >
               <Save className="w-4 h-4 text-gold-400" />
-              <span>Save Project</span>
+              <span>Save</span>
             </button>
           </div>
         </div>
@@ -495,46 +653,80 @@ export const VersePosterCreatorPage: React.FC = () => {
           {/* Controls Column (5 cols) */}
           <div className="lg:col-span-5 space-y-6">
 
-            {/* THREE POSTER LANGUAGE OPTIONS */}
-            <div className="bg-navy-900 border border-navy-800 rounded-2xl p-4 shadow-xl">
-              <label className="block text-xs font-bold uppercase tracking-wider text-gold-400 mb-2">
-                Poster Language Mode
+            {/* LAYOUT ALIGNMENT PRESET */}
+            <div className="bg-navy-900 border border-navy-800 rounded-2xl p-4 shadow-xl space-y-3">
+              <label className="block text-xs font-bold uppercase tracking-wider text-gold-400">
+                Composition Style
               </label>
 
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 <button
-                  onClick={() => setPosterMode('english')}
-                  className={`py-2.5 px-2 rounded-xl border text-xs font-semibold transition-all ${
-                    posterMode === 'english'
+                  onClick={() => {
+                    setLayoutStyle('intimate_embrace');
+                    if (bgPreset === 'solomon_temple') setBgPreset('jesus_embrace');
+                  }}
+                  className={`p-2.5 rounded-xl border text-xs font-semibold transition-all text-left ${
+                    layoutStyle === 'intimate_embrace'
                       ? 'border-gold-500 bg-gold-500/15 text-gold-300 ring-1 ring-gold-500/40'
                       : 'border-navy-700 bg-navy-950 text-slate-400 hover:text-white'
                   }`}
                 >
-                  Option A<br/><span className="text-[11px] font-normal">English Poster</span>
+                  🕊 Intimate Embrace<br/>
+                  <span className="text-[10px] font-normal text-slate-400">Right negative space typography</span>
                 </button>
 
                 <button
-                  onClick={() => setPosterMode('tamil')}
-                  className={`py-2.5 px-2 rounded-xl border text-xs font-semibold transition-all ${
-                    posterMode === 'tamil'
+                  onClick={() => {
+                    setLayoutStyle('classic_centered');
+                    if (bgPreset === 'jesus_embrace') setBgPreset('solomon_temple');
+                  }}
+                  className={`p-2.5 rounded-xl border text-xs font-semibold transition-all text-left ${
+                    layoutStyle === 'classic_centered'
                       ? 'border-gold-500 bg-gold-500/15 text-gold-300 ring-1 ring-gold-500/40'
                       : 'border-navy-700 bg-navy-950 text-slate-400 hover:text-white'
                   }`}
                 >
-                  Option B<br/><span className="text-[11px] font-normal">Tamil Poster</span>
-                </button>
-
-                <button
-                  onClick={() => setPosterMode('bilingual')}
-                  className={`py-2.5 px-2 rounded-xl border text-xs font-semibold transition-all ${
-                    posterMode === 'bilingual'
-                      ? 'border-gold-500 bg-gold-500/15 text-gold-300 ring-1 ring-gold-500/40'
-                      : 'border-navy-700 bg-navy-950 text-slate-400 hover:text-white'
-                  }`}
-                >
-                  Option C<br/><span className="text-[11px] font-normal">Bilingual (Sample)</span>
+                  👑 Classic Centered<br/>
+                  <span className="text-[10px] font-normal text-slate-400">Centered full-width layout</span>
                 </button>
               </div>
+
+              {layoutStyle === 'classic_centered' && (
+                <div className="grid grid-cols-3 gap-2 pt-2 border-t border-navy-800">
+                  <button
+                    onClick={() => setPosterMode('english')}
+                    className={`py-1.5 px-2 rounded-lg border text-[11px] font-semibold transition-all ${
+                      posterMode === 'english'
+                        ? 'border-gold-500 bg-gold-500/15 text-gold-300'
+                        : 'border-navy-700 bg-navy-950 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    English
+                  </button>
+
+                  <button
+                    onClick={() => setPosterMode('tamil')}
+                    className={`py-1.5 px-2 rounded-lg border text-[11px] font-semibold transition-all ${
+                      posterMode === 'tamil'
+                        ? 'border-gold-500 bg-gold-500/15 text-gold-300'
+                        : 'border-navy-700 bg-navy-950 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    Tamil
+                  </button>
+
+                  <button
+                    onClick={() => setPosterMode('bilingual')}
+                    className={`py-1.5 px-2 rounded-lg border text-[11px] font-semibold transition-all ${
+                      posterMode === 'bilingual'
+                        ? 'border-gold-500 bg-gold-500/15 text-gold-300'
+                        : 'border-navy-700 bg-navy-950 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    Bilingual
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* AI BACKGROUND GENERATOR (DALL-E 3) */}
@@ -576,7 +768,7 @@ export const VersePosterCreatorPage: React.FC = () => {
                     value={aiPrompt}
                     onChange={(e) => setAiPrompt(e.target.value)}
                     className="w-full bg-navy-950 border border-navy-700 rounded-xl p-2 text-xs text-white focus:outline-none focus:border-gold-500"
-                    placeholder="E.g. King Solomon temple with golden beams..."
+                    placeholder="E.g. Jesus embracing a believer with golden hour rim light..."
                   />
                   <div className="flex flex-wrap gap-1.5">
                     {aiPresets.slice(2).map((p, idx) => (
@@ -654,19 +846,19 @@ export const VersePosterCreatorPage: React.FC = () => {
                     onChange={(e) => setDividerText(e.target.value)}
                     className="w-full bg-navy-950 border border-navy-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500"
                   >
-                    <option value="—  ❖  ⚜  ❖  —">—  ❖  ⚜  ❖  — (Sample)</option>
+                    <option value="—  ✝  —">—  ✝  — (Sample 2)</option>
+                    <option value="—  ❖  ⚜  ❖  —">—  ❖  ⚜  ❖  — (Sample 1)</option>
                     <option value="—  ✦  ⚜  ✦  —">—  ✦  ⚜  ✦  —</option>
-                    <option value="—  •  ✝  •  —">—  •  ✝  •  —</option>
                     <option value="❖  ❖  ❖">❖  ❖  ❖</option>
                     <option value="">None</option>
                   </select>
                 </div>
               </div>
 
-              {/* Top Header Toggle & Text */}
+              {/* Top Header / Hook Inputs */}
               <div className="p-3 bg-navy-950 rounded-xl border border-navy-800 space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-[11px] font-semibold text-gold-400">Top Header Line</label>
+                  <label className="text-[11px] font-semibold text-gold-400">Top Header / Main Hook</label>
                   <input
                     type="checkbox"
                     checked={showHeader}
@@ -675,45 +867,54 @@ export const VersePosterCreatorPage: React.FC = () => {
                   />
                 </div>
                 {showHeader && (
-                  <input
-                    type="text"
-                    value={headerText}
-                    onChange={(e) => setHeaderText(e.target.value)}
-                    className="w-full bg-navy-900 border border-navy-700 rounded-lg px-2.5 py-1.5 text-xs text-gold-300 font-serif text-center"
-                    placeholder="— HOLY BIBLE VERSE —"
-                  />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <input
+                      type="text"
+                      value={headerText}
+                      onChange={(e) => setHeaderText(e.target.value)}
+                      className="w-full bg-navy-900 border border-navy-700 rounded-lg px-2.5 py-1.5 text-xs text-gold-300 font-serif text-center"
+                      placeholder="e.g. I know you"
+                    />
+                    {layoutStyle === 'intimate_embrace' && (
+                      <input
+                        type="text"
+                        value={subtitleHook}
+                        onChange={(e) => setSubtitleHook(e.target.value)}
+                        className="w-full bg-navy-900 border border-navy-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 italic font-serif text-center"
+                        placeholder="e.g. always with me"
+                      />
+                    )}
+                  </div>
                 )}
               </div>
 
               {/* English Section */}
-              {(posterMode === 'english' || posterMode === 'bilingual') && (
-                <div className="space-y-2 p-3 bg-navy-950/80 rounded-xl border border-navy-800">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-white">English Verse (KJV)</span>
-                    <span className="text-[10px] text-gold-400 font-mono">Highlight In Gold</span>
-                  </div>
-                  <input
-                    type="text"
-                    value={englishHighlight}
-                    onChange={(e) => setEnglishHighlight(e.target.value)}
-                    placeholder="Highlighted Phrase (Gold)..."
-                    className="w-full bg-navy-900 border border-gold-500/30 rounded-lg px-2.5 py-1.5 text-xs text-gold-400 font-serif"
-                  />
-                  <textarea
-                    rows={2}
-                    value={englishText}
-                    onChange={(e) => setEnglishText(e.target.value)}
-                    placeholder="Body text (White)..."
-                    className="w-full bg-navy-900 border border-navy-700 rounded-lg p-2 text-xs text-slate-200 font-serif leading-relaxed"
-                  />
+              <div className="space-y-2 p-3 bg-navy-950/80 rounded-xl border border-navy-800">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-white">English Scripture</span>
+                  <span className="text-[10px] text-gold-400 font-mono">Highlight In Gold</span>
                 </div>
-              )}
+                <input
+                  type="text"
+                  value={englishHighlight}
+                  onChange={(e) => setEnglishHighlight(e.target.value)}
+                  placeholder="Highlighted Phrase (Gold)..."
+                  className="w-full bg-navy-900 border border-gold-500/30 rounded-lg px-2.5 py-1.5 text-xs text-gold-400 font-serif"
+                />
+                <textarea
+                  rows={3}
+                  value={englishText}
+                  onChange={(e) => setEnglishText(e.target.value)}
+                  placeholder="Body text (White)..."
+                  className="w-full bg-navy-900 border border-navy-700 rounded-lg p-2 text-xs text-slate-200 font-serif leading-relaxed"
+                />
+              </div>
 
-              {/* Tamil Section */}
-              {(posterMode === 'tamil' || posterMode === 'bilingual') && (
+              {/* Tamil Section (if in bilingual or tamil mode) */}
+              {layoutStyle === 'classic_centered' && (posterMode === 'tamil' || posterMode === 'bilingual') && (
                 <div className="space-y-2 p-3 bg-navy-950/80 rounded-xl border border-navy-800">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-white">Tamil Verse (BSI Union)</span>
+                    <span className="text-[11px] font-bold text-white">Tamil Scripture (BSI Union)</span>
                     <span className="text-[10px] text-gold-400 font-mono">Highlight In Gold</span>
                   </div>
                   <input
@@ -741,7 +942,7 @@ export const VersePosterCreatorPage: React.FC = () => {
                   value={dualReference}
                   onChange={(e) => setDualReference(e.target.value)}
                   className="w-full bg-navy-950 border border-navy-700 rounded-xl px-3 py-2 text-xs text-gold-400 font-bold text-center"
-                  placeholder="1 KINGS 8:15  |  1 இராஜாக்கள் 8:15"
+                  placeholder="1 KINGS 8:15"
                 />
               </div>
             </div>
@@ -782,7 +983,7 @@ export const VersePosterCreatorPage: React.FC = () => {
                     <button
                       onClick={() => {
                         setCustomBgUrl(null);
-                        setBgPreset('solomon_temple');
+                        setBgPreset('jesus_embrace');
                       }}
                       className="text-[10px] text-gold-400 underline"
                     >
@@ -793,18 +994,20 @@ export const VersePosterCreatorPage: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-2">
                   {[
-                    { id: 'solomon_temple', label: "👑 Solomon's Temple (Sample)" },
+                    { id: 'jesus_embrace', label: "🕊 Jesus' Embrace (Sample 2)" },
+                    { id: 'solomon_temple', label: "👑 Solomon's Temple (Sample 1)" },
                     { id: 'heavenly_gold', label: '✨ Heavenly Golden Light' },
                     { id: 'deep_navy_gold', label: '🌌 Deep Navy & Gold' },
                     { id: 'sunrise_mountains', label: '🌄 Sunrise Mountains' },
                     { id: 'starry_night', label: '⭐ Starry Night Sky' },
-                    { id: 'cross_silhouette', label: '✝ Cross Silhouette' },
                   ].map(style => (
                     <button
                       key={style.id}
                       onClick={() => {
                         setBgPreset(style.id);
                         setCustomBgUrl(null);
+                        if (style.id === 'jesus_embrace') setLayoutStyle('intimate_embrace');
+                        else if (style.id === 'solomon_temple') setLayoutStyle('classic_centered');
                       }}
                       className={`p-2.5 rounded-xl border text-left text-xs font-medium transition-all ${
                         !customBgUrl && bgPreset === style.id
@@ -888,7 +1091,7 @@ export const VersePosterCreatorPage: React.FC = () => {
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                   <span>Pixel-Perfect SVG Composition & Sharp Native PNG rendering</span>
                 </span>
-                <span className="text-[11px] text-gold-400">100% Accurate Tamil Unicode</span>
+                <span className="text-[11px] text-gold-400">Dual Style Support (Embrace + Solomon)</span>
               </div>
             </div>
           </div>

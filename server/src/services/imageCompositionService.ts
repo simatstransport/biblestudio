@@ -321,11 +321,16 @@ export class ImageCompositionService {
     // 1. Prepare Base Background
     let baseSharp: sharp.Sharp;
 
-    // Check if preset is solomon_temple
+    // Check if preset is solomon_temple or jesus_embrace
     const samplePresetPath = path.resolve(process.cwd(), 'client/public/presets/solomon_temple.jpg');
     const sampleAltPath = path.resolve(process.cwd(), '../client/public/presets/solomon_temple.jpg');
+    const embracePresetPath = path.resolve(process.cwd(), 'client/public/presets/jesus_embrace.jpg');
+    const embraceAltPath = path.resolve(process.cwd(), '../client/public/presets/jesus_embrace.jpg');
 
-    if (options.background.value === 'solomon_temple' && (fs.existsSync(samplePresetPath) || fs.existsSync(sampleAltPath))) {
+    if (options.background.value === 'jesus_embrace' && (fs.existsSync(embracePresetPath) || fs.existsSync(embraceAltPath))) {
+      const activePath = fs.existsSync(embracePresetPath) ? embracePresetPath : embraceAltPath;
+      baseSharp = sharp(activePath).resize(width, height, { fit: 'cover' });
+    } else if (options.background.value === 'solomon_temple' && (fs.existsSync(samplePresetPath) || fs.existsSync(sampleAltPath))) {
       const activePath = fs.existsSync(samplePresetPath) ? samplePresetPath : sampleAltPath;
       baseSharp = sharp(activePath).resize(width, height, { fit: 'cover' });
     } else if (options.background.type === 'preset') {
@@ -355,6 +360,8 @@ export class ImageCompositionService {
         const base64Data = options.background.value.split(',')[1];
         const imgBuffer = Buffer.from(base64Data, 'base64');
         baseSharp = sharp(imgBuffer).resize(width, height, { fit: 'cover' });
+      } else if (options.background.value.includes('jesus_embrace') && fs.existsSync(embracePresetPath)) {
+        baseSharp = sharp(embracePresetPath).resize(width, height, { fit: 'cover' });
       } else if (options.background.value.includes('solomon_temple') && fs.existsSync(samplePresetPath)) {
         baseSharp = sharp(samplePresetPath).resize(width, height, { fit: 'cover' });
       } else {

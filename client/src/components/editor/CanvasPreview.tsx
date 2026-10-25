@@ -72,6 +72,12 @@ export const CanvasPreview: React.FC<CanvasPreviewProps> = ({
     }
     // Presets
     switch (background.value) {
+      case 'jesus_embrace':
+        return {
+          backgroundImage: `url('/presets/jesus_embrace.jpg')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        };
       case 'solomon_temple':
         return {
           backgroundImage: `url('/presets/solomon_temple.jpg')`,
