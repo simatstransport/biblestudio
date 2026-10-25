@@ -146,11 +146,20 @@ generateRouter.post('/image', requireAuth, async (req: Request, res: Response, n
   try {
     const userId = req.user!.id;
     const input = imageGenerationSchema.parse(req.body);
+    const isSolomonRequest = /solomon|temple sample|sample style/i.test(input.prompt);
+
+    // Engineer prompt for photorealistic quality with zero text distortions
+    let engineeredPrompt = input.prompt.trim();
+    if (input.type === 'spiritual_background' || /bible|scripture|verse|god|lord|jesus|temple|heaven|holiness|divine|psalm|altar/i.test(input.prompt)) {
+      engineeredPrompt = `Photorealistic 8K cinematic biblical scene: ${input.prompt}. Ancient Jerusalem temple atmosphere, majestic stone pillars, celestial heavenly god rays beam down from above, golden crown resting on deep royal blue velvet cloth, warm golden dust motes, dramatic chiaroscuro Rembrandt lighting, awe-inspiring sacred majesty. Pure cinematic background image, zero text, no letters, no words, no subtitles, no watermarks, 8K hyper-detailed wallpaper.`;
+    } else {
+      engineeredPrompt = `Ultra-dynamic 2026 YouTube thumbnail background: ${input.prompt}. High contrast, cinematic studio lighting, dramatic color palette, electric rim lighting, clean negative space on side for large text overlay, sharp depth of field, 8K resolution, zero text, no words, no letters, no typography, no watermarks.`;
+    }
     const router = await createRouterForUser(userId);
 
     try {
       const result = await router.generateImage({
-        prompt: input.prompt,
+        prompt: engineeredPrompt,
         aspectRatio: input.aspectRatio,
         style: input.style
       });
@@ -166,7 +175,7 @@ generateRouter.post('/image', requireAuth, async (req: Request, res: Response, n
     } catch (aiErr: any) {
       console.warn('AI image generation unavailable, returning recommended preset background:', aiErr.message);
       // Fallback gracefully to high-res spiritual preset background
-      const fallbackPreset = input.type === 'spiritual_background' ? 'heavenly_gold' : 'cinematic_bold';
+      const fallbackPreset = isSolomonRequest || input.type === 'spiritual_background' ? 'solomon_temple' : 'cinematic_bold';
       return res.json({
         success: true,
         presetFallback: true,

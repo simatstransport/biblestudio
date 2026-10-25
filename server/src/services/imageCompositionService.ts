@@ -22,6 +22,8 @@ export interface ComposeOptions {
     fontWeight?: string;
     align?: 'left' | 'center' | 'right';
     shadow?: boolean;
+    stroke?: string;
+    strokeWidth?: number;
     backgroundColor?: string;
   }>;
   images?: Array<{
@@ -34,6 +36,7 @@ export interface ComposeOptions {
     width: number;
     height: number;
     borderRadius?: number;
+    glow?: boolean;
   }>;
   contactInfo?: {
     enabled: boolean;
@@ -72,35 +75,36 @@ export class ImageCompositionService {
     let gradientSvg = '';
 
     switch (preset) {
+      case 'solomon_temple':
       case 'heavenly_gold':
         gradientSvg = `
           <defs>
-            <radialGradient id="grad" cx="50%" cy="30%" r="70%">
+            <radialGradient id="grad" cx="50%" cy="25%" r="75%">
               <stop offset="0%" stop-color="#FFE8A3" />
-              <stop offset="35%" stop-color="#D4AF37" />
-              <stop offset="70%" stop-color="#4A3B10" />
-              <stop offset="100%" stop-color="#140E02" />
+              <stop offset="25%" stop-color="#D4AF37" />
+              <stop offset="60%" stop-color="#3D2E0B" />
+              <stop offset="100%" stop-color="#0B132B" />
             </radialGradient>
             <linearGradient id="ray" x1="50%" y1="0%" x2="50%" y2="100%">
-              <stop offset="0%" stop-color="rgba(255, 245, 200, 0.4)" />
+              <stop offset="0%" stop-color="rgba(255, 248, 220, 0.45)" />
               <stop offset="100%" stop-color="rgba(212, 175, 55, 0)" />
             </linearGradient>
           </defs>
           <rect width="${width}" height="${height}" fill="url(#grad)" />
-          <polygon points="${width * 0.4},0 ${width * 0.6},0 ${width * 0.9},${height} ${width * 0.1},${height}" fill="url(#ray)" opacity="0.3" />
+          <polygon points="${width * 0.35},0 ${width * 0.65},0 ${width * 0.95},${height} ${width * 0.05},${height}" fill="url(#ray)" opacity="0.4" />
         `;
         break;
 
       case 'deep_navy_gold':
         gradientSvg = `
           <defs>
-            <radialGradient id="grad" cx="50%" cy="50%" r="75%">
+            <radialGradient id="grad" cx="50%" cy="45%" r="80%">
               <stop offset="0%" stop-color="#1C2D4A" />
-              <stop offset="60%" stop-color="#0B132B" />
-              <stop offset="100%" stop-color="#050814" />
+              <stop offset="55%" stop-color="#0B132B" />
+              <stop offset="100%" stop-color="#040711" />
             </radialGradient>
             <linearGradient id="goldAcc" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#C5A059" stop-opacity="0.3"/>
+              <stop offset="0%" stop-color="#C5A059" stop-opacity="0.35"/>
               <stop offset="100%" stop-color="#E6CA65" stop-opacity="0"/>
             </linearGradient>
           </defs>
@@ -116,18 +120,18 @@ export class ImageCompositionService {
           <defs>
             <linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
               <stop offset="0%" stop-color="#FF7E5F" />
-              <stop offset="40%" stop-color="#FEB47B" />
+              <stop offset="35%" stop-color="#FEB47B" />
               <stop offset="70%" stop-color="#2C3E50" />
-              <stop offset="100%" stop-color="#0A1118" />
+              <stop offset="100%" stop-color="#070D14" />
             </linearGradient>
-            <radialGradient id="sun" cx="50%" cy="40%" r="30%">
+            <radialGradient id="sun" cx="50%" cy="35%" r="30%">
               <stop offset="0%" stop-color="#FFFFFF" />
               <stop offset="50%" stop-color="#FFEAA7" />
               <stop offset="100%" stop-color="rgba(255, 234, 167, 0)" />
             </radialGradient>
           </defs>
           <rect width="${width}" height="${height}" fill="url(#grad)" />
-          <circle cx="${width * 0.5}" cy="${height * 0.4}" r="${width * 0.2}" fill="url(#sun)" opacity="0.8" />
+          <circle cx="${width * 0.5}" cy="${height * 0.35}" r="${width * 0.2}" fill="url(#sun)" opacity="0.85" />
           <polygon points="0,${height} ${width * 0.3},${height * 0.65} ${width * 0.65},${height} 0,${height}" fill="#16202C" opacity="0.85" />
           <polygon points="${width * 0.35},${height} ${width * 0.75},${height * 0.6} ${width},${height} ${width * 0.35},${height}" fill="#0D141C" />
         `;
@@ -137,8 +141,8 @@ export class ImageCompositionService {
         gradientSvg = `
           <defs>
             <radialGradient id="grad" cx="50%" cy="30%" r="80%">
-              <stop offset="0%" stop-color="#1B1F38" />
-              <stop offset="50%" stop-color="#0D0E1A" />
+              <stop offset="0%" stop-color="#1E2340" />
+              <stop offset="50%" stop-color="#0E101D" />
               <stop offset="100%" stop-color="#05060A" />
             </radialGradient>
           </defs>
@@ -151,35 +155,19 @@ export class ImageCompositionService {
         `;
         break;
 
-      case 'cross_silhouette':
-        gradientSvg = `
-          <defs>
-            <radialGradient id="grad" cx="50%" cy="40%" r="70%">
-              <stop offset="0%" stop-color="#E29578" />
-              <stop offset="50%" stop-color="#8338EC" />
-              <stop offset="100%" stop-color="#0F051D" />
-            </radialGradient>
-          </defs>
-          <rect width="${width}" height="${height}" fill="url(#grad)" />
-          <!-- Cross silhouette centered -->
-          <rect x="${width * 0.485}" y="${height * 0.4}" width="${width * 0.03}" height="${height * 0.35}" fill="#07020E" />
-          <rect x="${width * 0.43}" y="${height * 0.48}" width="${width * 0.14}" height="${width * 0.03}" fill="#07020E" />
-          <ellipse cx="${width * 0.5}" cy="${height * 0.82}" rx="${width * 0.6}" ry="${height * 0.18}" fill="#07020E" />
-        `;
-        break;
-
       case 'cinematic_bold':
       default:
         gradientSvg = `
           <defs>
             <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#FF416C" />
-              <stop offset="50%" stop-color="#8A2387" />
-              <stop offset="100%" stop-color="#1A0933" />
+              <stop offset="0%" stop-color="#141E30" />
+              <stop offset="50%" stop-color="#243B55" />
+              <stop offset="100%" stop-color="#0B0E14" />
             </linearGradient>
-            <radialGradient id="glow" cx="80%" cy="20%" r="50%">
-              <stop offset="0%" stop-color="#FF4B2B" stop-opacity="0.6" />
-              <stop offset="100%" stop-color="#FF4B2B" stop-opacity="0" />
+            <radialGradient id="glow" cx="80%" cy="20%" r="55%">
+              <stop offset="0%" stop-color="#FF416C" stop-opacity="0.45" />
+              <stop offset="50%" stop-color="#8A2387" stop-opacity="0.25" />
+              <stop offset="100%" stop-color="#000000" stop-opacity="0" />
             </radialGradient>
           </defs>
           <rect width="${width}" height="${height}" fill="url(#grad)" />
@@ -220,6 +208,22 @@ export class ImageCompositionService {
     const marginX = width * 0.05;
     const marginY = height * 0.05;
 
+    // For Bible Posters: Add natural top vignette scrim for crystal-clear readability
+    let scrimSvg = '';
+    if (options.type === 'bible_poster') {
+      scrimSvg = `
+        <defs>
+          <linearGradient id="topPosterScrim" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#050B18" stop-opacity="0.88" />
+            <stop offset="50%" stop-color="#050B18" stop-opacity="0.75" />
+            <stop offset="85%" stop-color="#050B18" stop-opacity="0.25" />
+            <stop offset="100%" stop-color="#050B18" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <rect width="${width}" height="${height * 0.72}" fill="url(#topPosterScrim)" />
+      `;
+    }
+
     for (const item of options.texts) {
       if (!item.text || !item.text.trim()) continue;
 
@@ -227,7 +231,7 @@ export class ImageCompositionService {
       const fontSize = Math.max(16, item.fontSize || 40);
       const color = item.color || '#FFFFFF';
       const fontWeight = item.fontWeight || 'bold';
-      const fontFamily = item.fontFamily || "'Noto Sans Tamil', 'Inter', system-ui, -apple-system, sans-serif";
+      const fontFamily = item.fontFamily || "'Cinzel', 'Noto Sans Tamil', 'Inter', serif";
 
       // Calculate absolute coordinate
       const posX = item.x <= 100 ? (item.x / 100) * width : item.x;
@@ -239,9 +243,10 @@ export class ImageCompositionService {
 
       // Split multiline text
       const lines = escaped.split('\n');
-      const lineHeight = fontSize * 1.25;
+      const lineHeight = fontSize * 1.35;
 
       const filterDef = item.shadow ? 'filter="url(#textShadow)"' : '';
+      const strokeAttr = item.stroke ? `stroke="${item.stroke}" stroke-width="${item.strokeWidth || 4}" paint-order="stroke fill"` : '';
 
       const tspanLines = lines.map((line, idx) => {
         const dy = idx === 0 ? 0 : lineHeight;
@@ -258,6 +263,7 @@ export class ImageCompositionService {
           fill="${color}" 
           text-anchor="${textAnchor}"
           ${filterDef}
+          ${strokeAttr}
         >
           ${tspanLines}
         </text>
@@ -294,10 +300,11 @@ export class ImageCompositionService {
     const svg = `
       <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <filter id="textShadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="2" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.85"/>
+          <filter id="textShadow" x="-30%" y="-30%" width="160%" height="160%">
+            <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.95"/>
           </filter>
         </defs>
+        ${scrimSvg}
         ${textElements.join('\n')}
       </svg>
     `;
@@ -314,7 +321,14 @@ export class ImageCompositionService {
     // 1. Prepare Base Background
     let baseSharp: sharp.Sharp;
 
-    if (options.background.type === 'preset') {
+    // Check if preset is solomon_temple
+    const samplePresetPath = path.resolve(process.cwd(), 'client/public/presets/solomon_temple.jpg');
+    const sampleAltPath = path.resolve(process.cwd(), '../client/public/presets/solomon_temple.jpg');
+
+    if (options.background.value === 'solomon_temple' && (fs.existsSync(samplePresetPath) || fs.existsSync(sampleAltPath))) {
+      const activePath = fs.existsSync(samplePresetPath) ? samplePresetPath : sampleAltPath;
+      baseSharp = sharp(activePath).resize(width, height, { fit: 'cover' });
+    } else if (options.background.type === 'preset') {
       const presetBuffer = ImageCompositionService.createPresetBackground(options.background.value, width, height);
       baseSharp = sharp(presetBuffer);
     } else if (options.background.type === 'color') {
@@ -327,13 +341,23 @@ export class ImageCompositionService {
         }
       });
     } else if (options.background.type === 'image' && options.background.value) {
-      // If it's a base64 data URI or path
-      if (options.background.value.startsWith('data:image')) {
+      if (options.background.value.startsWith('http://') || options.background.value.startsWith('https://')) {
+        // Fetch remote AI generated image (e.g. OpenAI DALL-E 3)
+        try {
+          const fetchRes = await fetch(options.background.value);
+          const arrayBuf = await fetchRes.arrayBuffer();
+          baseSharp = sharp(Buffer.from(arrayBuf)).resize(width, height, { fit: 'cover' });
+        } catch {
+          const presetBuffer = ImageCompositionService.createPresetBackground('heavenly_gold', width, height);
+          baseSharp = sharp(presetBuffer);
+        }
+      } else if (options.background.value.startsWith('data:image')) {
         const base64Data = options.background.value.split(',')[1];
         const imgBuffer = Buffer.from(base64Data, 'base64');
         baseSharp = sharp(imgBuffer).resize(width, height, { fit: 'cover' });
+      } else if (options.background.value.includes('solomon_temple') && fs.existsSync(samplePresetPath)) {
+        baseSharp = sharp(samplePresetPath).resize(width, height, { fit: 'cover' });
       } else {
-        // Fallback preset if image URL is invalid or remote
         const presetBuffer = ImageCompositionService.createPresetBackground('deep_navy_gold', width, height);
         baseSharp = sharp(presetBuffer);
       }
@@ -354,6 +378,9 @@ export class ImageCompositionService {
           let imgBuf: Buffer;
           if (img.buffer) {
             imgBuf = img.buffer;
+          } else if (img.url?.startsWith('http://') || img.url?.startsWith('https://')) {
+            const r = await fetch(img.url);
+            imgBuf = Buffer.from(await r.arrayBuffer());
           } else if (img.url?.startsWith('data:image')) {
             const b64 = img.url.split(',')[1];
             imgBuf = Buffer.from(b64, 'base64');

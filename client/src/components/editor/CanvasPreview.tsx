@@ -72,6 +72,12 @@ export const CanvasPreview: React.FC<CanvasPreviewProps> = ({
     }
     // Presets
     switch (background.value) {
+      case 'solomon_temple':
+        return {
+          backgroundImage: `url('/presets/solomon_temple.jpg')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        };
       case 'heavenly_gold':
         return {
           background: 'radial-gradient(circle at 50% 30%, #FFE8A3 0%, #D4AF37 35%, #4A3B10 70%, #140E02 100%)'
@@ -177,6 +183,17 @@ export const CanvasPreview: React.FC<CanvasPreviewProps> = ({
         className={`relative rounded-xl overflow-hidden shadow-2xl border border-navy-700 select-none ${getAspectClass()}`}
         onClick={() => onSelectText && onSelectText(null)}
       >
+        {/* Natural Top Vignette Scrim for Posters */}
+        {type === 'bible_poster' && (
+          <div 
+            className="absolute inset-0 pointer-events-none z-10" 
+            style={{
+              background: 'linear-gradient(180deg, rgba(5, 11, 24, 0.88) 0%, rgba(5, 11, 24, 0.72) 48%, rgba(5, 11, 24, 0.2) 75%, transparent 100%)',
+              height: '75%'
+            }}
+          />
+        )}
+
         {/* Safe-Area Guide Overlay */}
         {showSafeGuides && (
           <div className="absolute inset-0 pointer-events-none z-40 border-2 border-dashed border-gold-500/40 m-[5%] flex items-start justify-end p-2">
@@ -204,7 +221,12 @@ export const CanvasPreview: React.FC<CanvasPreviewProps> = ({
               src={img.url}
               alt={img.type}
               className={`w-full h-full ${img.type === 'logo' ? 'object-contain' : 'object-cover drop-shadow-2xl'}`}
-              style={{ borderRadius: img.borderRadius ? `${img.borderRadius}px` : undefined }}
+              style={{ 
+                borderRadius: img.borderRadius ? `${img.borderRadius}px` : undefined,
+                filter: img.glow 
+                  ? 'drop-shadow(0 0 16px rgba(255, 215, 0, 0.8)) drop-shadow(0 0 32px rgba(255, 230, 0, 0.45))' 
+                  : 'drop-shadow(0 8px 24px rgba(0,0,0,0.85))'
+              }}
             />
           </div>
         ))}
@@ -212,6 +234,10 @@ export const CanvasPreview: React.FC<CanvasPreviewProps> = ({
         {/* Text Overlays */}
         {texts.map((item) => {
           const isSelected = selectedTextId === item.id;
+          const strokeStyle = item.stroke ? {
+            WebkitTextStroke: `${(item.strokeWidth || 4) * 0.75}px ${item.stroke}`,
+            paintOrder: 'stroke fill',
+          } : {};
           return (
             <div
               key={item.id}
@@ -229,7 +255,10 @@ export const CanvasPreview: React.FC<CanvasPreviewProps> = ({
                 fontFamily: item.fontFamily || "'Noto Sans Tamil', 'Inter', sans-serif",
                 textAlign: item.align || 'left',
                 transform: item.align === 'center' ? 'translateX(-50%)' : item.align === 'right' ? 'translateX(-100%)' : 'none',
-                textShadow: item.shadow ? '0 4px 12px rgba(0,0,0,0.85)' : 'none',
+                textShadow: item.shadow ? '0 4px 14px rgba(0,0,0,0.95)' : 'none',
+                letterSpacing: item.letterSpacing ? `${item.letterSpacing}px` : undefined,
+                backgroundColor: item.backgroundColor || undefined,
+                ...strokeStyle,
                 zIndex: 30,
               }}
               className={`cursor-pointer px-2 py-1 rounded transition-all leading-tight whitespace-pre-wrap ${

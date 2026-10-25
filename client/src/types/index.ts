@@ -52,6 +52,9 @@ export interface TextOverlay {
   fontWeight: string;
   align: 'left' | 'center' | 'right';
   shadow: boolean;
+  stroke?: string;
+  strokeWidth?: number;
+  letterSpacing?: number;
   backgroundColor?: string;
 }
 
@@ -64,6 +67,7 @@ export interface ImageOverlay {
   width: number;
   height: number;
   borderRadius?: number;
+  glow?: boolean;
 }
 
 export interface ProjectData {

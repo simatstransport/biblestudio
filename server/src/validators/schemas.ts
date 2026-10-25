@@ -59,6 +59,8 @@ export const textOverlaySchema = z.object({
   fontWeight: z.string().default('bold'),
   align: z.enum(['left', 'center', 'right']).default('left'),
   shadow: z.boolean().default(true),
+  stroke: z.string().optional(),
+  strokeWidth: z.number().optional(),
   backgroundColor: z.string().optional(),
   letterSpacing: z.number().optional()
 });
@@ -72,6 +74,7 @@ export const imageOverlaySchema = z.object({
   width: z.number(),
   height: z.number(),
   borderRadius: z.number().default(0),
+  glow: z.boolean().optional(),
   border: z.string().optional()
 });
 
