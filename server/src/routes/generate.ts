@@ -355,7 +355,7 @@ Additional Caption Request: ${input.additionalCaption || 'None'}`;
         aspectRatio: input.aspectRatio,
         style: 'photorealistic'
       });
-      artworkUrl = imgRes.imageUrl;
+      artworkUrl = imgRes.imageUrl || '';
       imageProvider = imgRes.provider;
     } catch (imgErr: any) {
       console.warn('Live image generation failed, using curated studio background:', imgErr.message);
@@ -642,7 +642,7 @@ Visual Preferences: ${input.visualPreferences || 'Cinematic realism, high contra
         aspectRatio: '16:9',
         style: 'cinematic'
       });
-      artworkUrl = imgRes.imageUrl;
+      artworkUrl = imgRes.imageUrl || '';
     } catch (imgErr: any) {
       console.warn('Live thumbnail image generation fallback:', imgErr.message);
       artworkUrl = 'cinematic_bold';

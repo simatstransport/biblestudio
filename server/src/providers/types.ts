@@ -7,7 +7,8 @@ export type TaskType =
   | 'caption_generation' 
   | 'prompt_enhancement' 
   | 'image_generation' 
-  | 'final_render';
+  | 'final_render'
+  | 'creative_brief';
 
 export interface GenerationResult<T = string> {
   data: T;
