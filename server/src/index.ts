@@ -24,7 +24,7 @@ app.use(express.json({ limit: '25mb' }));
 app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 
 // Health Check
-app.get('/api/health', (req, res) => {
+const healthHandler = (req: express.Request, res: express.Response) => {
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
@@ -32,22 +32,38 @@ app.get('/api/health', (req, res) => {
     version: '1.0.0',
     supabaseConnected: Boolean(config.supabase.url && config.supabase.serviceRoleKey)
   });
-});
+};
 
-// Mount API routes
+app.get('/api/health', healthHandler);
+app.get('/health', healthHandler);
+
+// Mount API routes with and without /api prefix for seamless Vercel serverless rewrite compatibility
 app.use('/api/ai-settings', aiSettingsRouter);
+app.use('/ai-settings', aiSettingsRouter);
+
 app.use('/api/generate', generateRouter);
+app.use('/generate', generateRouter);
+
 app.use('/api/ai', generateRouter);
+app.use('/ai', generateRouter);
+
 app.use('/api/verses', versesRouter);
+app.use('/verses', versesRouter);
+
 app.use('/api/projects', projectsRouter);
+app.use('/projects', projectsRouter);
+
 app.use('/api/history', historyRouter);
+app.use('/history', historyRouter);
+
 app.use('/api/instagram', instagramRouter);
+app.use('/instagram', instagramRouter);
 
 // Global Error Handler
 app.use(errorHandler);
 
-// Start Server
-if (process.env.NODE_ENV !== 'test') {
+// Start Server locally (skip when running inside Vercel serverless environment)
+if (!process.env.VERCEL && process.env.NODE_ENV !== 'test') {
   app.listen(config.port, () => {
     console.log(`✨ Faith & Creator Studio API listening on http://localhost:${config.port}`);
     console.log(`🔒 Encryption service initialized for API key protection.`);
