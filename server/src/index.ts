@@ -37,6 +37,7 @@ app.get('/api/health', (req, res) => {
 // Mount API routes
 app.use('/api/ai-settings', aiSettingsRouter);
 app.use('/api/generate', generateRouter);
+app.use('/api/ai', generateRouter);
 app.use('/api/verses', versesRouter);
 app.use('/api/projects', projectsRouter);
 app.use('/api/history', historyRouter);

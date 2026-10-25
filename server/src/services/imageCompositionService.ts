@@ -5,6 +5,7 @@ import fs from 'fs';
 export interface ComposeOptions {
   type: 'youtube_thumbnail' | 'bible_poster';
   aspectRatio: '16:9' | '4:5' | '1:1' | '9:16';
+  scrimType?: 'top' | 'right' | 'bottom' | 'radial' | 'none';
   background: {
     type: 'color' | 'gradient' | 'image' | 'preset';
     value: string;
@@ -208,13 +209,39 @@ export class ImageCompositionService {
     const marginX = width * 0.05;
     const marginY = height * 0.05;
 
-    // For Bible Posters: Add natural top vignette scrim for crystal-clear readability
+    // Add natural vignette scrim for crystal-clear readability based on AI text area
     let scrimSvg = '';
-    if (options.type === 'bible_poster') {
+    const scrim = options.scrimType || (options.type === 'bible_poster' ? 'top' : 'none');
+
+    if (scrim === 'right') {
+      scrimSvg = `
+        <defs>
+          <linearGradient id="rightScrim" x1="100%" y1="0%" x2="0%" y2="0%">
+            <stop offset="0%" stop-color="#050B18" stop-opacity="0.92" />
+            <stop offset="35%" stop-color="#050B18" stop-opacity="0.78" />
+            <stop offset="60%" stop-color="#050B18" stop-opacity="0.25" />
+            <stop offset="100%" stop-color="#050B18" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <rect x="${width * 0.35}" width="${width * 0.65}" height="${height}" fill="url(#rightScrim)" />
+      `;
+    } else if (scrim === 'bottom') {
+      scrimSvg = `
+        <defs>
+          <linearGradient id="bottomScrim" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" stop-color="#050B18" stop-opacity="0.92" />
+            <stop offset="45%" stop-color="#050B18" stop-opacity="0.75" />
+            <stop offset="80%" stop-color="#050B18" stop-opacity="0.25" />
+            <stop offset="100%" stop-color="#050B18" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <rect y="${height * 0.35}" width="${width}" height="${height * 0.65}" fill="url(#bottomScrim)" />
+      `;
+    } else if (scrim === 'top') {
       scrimSvg = `
         <defs>
           <linearGradient id="topPosterScrim" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#050B18" stop-opacity="0.88" />
+            <stop offset="0%" stop-color="#050B18" stop-opacity="0.90" />
             <stop offset="50%" stop-color="#050B18" stop-opacity="0.75" />
             <stop offset="85%" stop-color="#050B18" stop-opacity="0.25" />
             <stop offset="100%" stop-color="#050B18" stop-opacity="0" />

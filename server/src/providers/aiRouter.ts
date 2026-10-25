@@ -180,7 +180,7 @@ export class AIRouter {
   async generateImage(options: ImagePromptOptions): Promise<ImageGenerationResult> {
     const startTime = Date.now();
 
-    // Check if OpenAI is available for image generation
+    // Try OpenAI DALL-E 3 first if configured
     if (this.openai) {
       try {
         const result = await this.openai.generateImage(options);
@@ -211,6 +211,25 @@ export class AIRouter {
       }
     }
 
-    throw new Error('No image-capable AI provider configured. DALL-E requires an OpenAI API key.');
+    // If Gemini is configured without OpenAI
+    if (this.gemini) {
+      try {
+        const gemResult = await this.gemini.generateImage(options);
+        const durationMs = Date.now() - startTime;
+        await this.recordHistory('gemini', 'imagen-3.0-generate-002', 'image_generation', false, 'success', durationMs);
+        return {
+          imageUrl: gemResult.url,
+          mimeType: 'image/jpeg',
+          provider: 'gemini',
+          model: 'imagen-3.0-generate-002',
+          durationMs,
+          fallbackUsed: false
+        };
+      } catch (gemErr: any) {
+        throw new Error(`Google Imagen generation failed: ${gemErr.message}`);
+      }
+    }
+
+    throw new Error('No image-capable AI provider configured. Please provide an OpenAI or Google Gemini API key in Settings.');
   }
 }

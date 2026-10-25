@@ -100,3 +100,35 @@ export const renderFinalSchema = z.object({
     text: z.string().optional()
   }).optional()
 });
+
+
+export const posterAISchema = z.object({
+  verseReference: z.string().min(1, 'Verse reference is required'),
+  verseText: z.string().min(1, 'Verse text is required'),
+  language: z.enum(['english', 'tamil', 'bilingual']).default('english'),
+  purposeOrTheme: z.string().default('Devotional reflection'),
+  translation: z.string().optional(),
+  atmosphere: z.string().optional(),
+  visualPreferences: z.string().optional(),
+  additionalCaption: z.string().optional(),
+  aspectRatio: z.enum(['4:5', '1:1', '9:16']).default('4:5')
+});
+
+export const thumbnailAISchema = z.object({
+  videoTitle: z.string().min(1, 'Video title is required'),
+  summary: z.string().min(1, 'Content summary is required'),
+  channelName: z.string().optional(),
+  targetAudience: z.string().default('General'),
+  language: z.enum(['english', 'tamil', 'bilingual']).default('english'),
+  tone: z.string().optional(),
+  visualPreferences: z.string().optional(),
+  aspectRatio: z.enum(['16:9']).default('16:9')
+});
+
+export const regenerateTextSchema = z.object({
+  artworkUrl: z.string().min(1, 'Artwork URL is required'),
+  texts: z.array(textOverlaySchema).default([]),
+  aspectRatio: z.enum(['16:9', '4:5', '1:1', '9:16']).default('4:5'),
+  type: z.enum(['bible_poster', 'youtube_thumbnail']).default('bible_poster'),
+  scrimType: z.enum(['top', 'right', 'bottom', 'radial', 'none']).optional()
+});

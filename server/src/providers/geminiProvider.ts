@@ -78,6 +78,40 @@ export class GeminiProvider {
     return text;
   }
 
+  async generateImage(options: ImagePromptOptions): Promise<{ url: string }> {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${this.apiKey}`;
+    
+    let ar = '1:1';
+    if (options.aspectRatio === '16:9') ar = '16:9';
+    else if (options.aspectRatio === '4:5') ar = '3:4';
+    else if (options.aspectRatio === '9:16') ar = '9:16';
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        instances: [{ prompt: options.prompt }],
+        parameters: {
+          sampleCount: 1,
+          aspectRatio: ar,
+          outputMimeType: 'image/jpeg'
+        }
+      })
+    });
+
+    const data = await response.json() as any;
+
+    if (!response.ok || !data.predictions?.[0]?.bytesBase64Encoded) {
+      const errMsg = data.error?.message || 'Google Imagen 3 API failed to generate image.';
+      throw new Error(errMsg);
+    }
+
+    const base64 = data.predictions[0].bytesBase64Encoded;
+    return {
+      url: `data:image/jpeg;base64,${base64}`
+    };
+  }
+
   static isQuotaError(err: any): boolean {
     return (
       err.status === 429 ||

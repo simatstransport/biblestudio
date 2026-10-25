@@ -214,5 +214,86 @@ export const api = {
   // Generation History
   async getHistory(): Promise<{ success: boolean; data: HistoryItem[] }> {
     return apiRequest('/history');
+  },
+
+  // AI-Powered Creative Pipeline
+  async generatePosterAI(input: {
+    verseReference: string;
+    verseText: string;
+    language: 'english' | 'tamil' | 'bilingual';
+    purposeOrTheme: string;
+    translation?: string;
+    atmosphere?: string;
+    visualPreferences?: string;
+    additionalCaption?: string;
+    aspectRatio?: '4:5' | '1:1' | '9:16';
+  }) {
+    return apiRequest<{
+      success: boolean;
+      creativeBrief: any;
+      artworkUrl: string;
+      finalDataUrl: string;
+      texts: any[];
+      aspectRatio: string;
+      dimensions: { width: number; height: number };
+      durationMs: number;
+    }>('/generate/poster-ai', {
+      method: 'POST',
+      body: JSON.stringify(input)
+    });
+  },
+
+  async generateThumbnailAI(input: {
+    videoTitle: string;
+    summary: string;
+    channelName?: string;
+    targetAudience: string;
+    language: 'english' | 'tamil' | 'bilingual';
+    tone?: string;
+    visualPreferences?: string;
+    aspectRatio?: '16:9';
+  }) {
+    return apiRequest<{
+      success: boolean;
+      creativeBrief: any;
+      artworkUrl: string;
+      finalDataUrl: string;
+      texts: any[];
+      aspectRatio: string;
+      dimensions: { width: number; height: number };
+      durationMs: number;
+    }>('/generate/thumbnail-ai', {
+      method: 'POST',
+      body: JSON.stringify(input)
+    });
+  },
+
+  async regenerateAIText(input: {
+    artworkUrl: string;
+    texts: any[];
+    aspectRatio: string;
+    type: 'bible_poster' | 'youtube_thumbnail';
+    scrimType?: string;
+  }) {
+    return apiRequest<{
+      success: boolean;
+      finalDataUrl: string;
+      dimensions: { width: number; height: number };
+    }>('/generate/regenerate-text', {
+      method: 'POST',
+      body: JSON.stringify(input)
+    });
+  },
+
+  // Manual Instagram Trigger
+  async publishToInstagramManual(imageUrl: string, caption: string) {
+    return apiRequest<{
+      success: boolean;
+      message: string;
+      mediaId?: string;
+    }>('/instagram/publish-custom', {
+      method: 'POST',
+      body: JSON.stringify({ imageUrl, caption })
+    });
   }
 };
