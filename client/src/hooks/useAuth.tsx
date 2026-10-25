@@ -19,8 +19,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 1. If Supabase is configured, use official session listener
-    if (isSupabaseConfigured && supabase) {
+    // Listen to official Supabase session
+    if (supabase) {
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (session?.user) {
           setUser({
@@ -57,7 +57,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         subscription.unsubscribe();
       };
     } else {
-      // 2. Local fallback if Supabase URL has not been entered yet
       const savedUser = localStorage.getItem('faith_studio_user');
       if (savedUser) {
         try {
@@ -71,10 +70,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signInWithGoogle = async () => {
-    if (!isSupabaseConfigured) {
-      throw new Error('Supabase is not configured yet. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY, or use Sandbox Demo Login.');
+    try {
+      await supabaseGoogleLogin();
+    } catch (err: any) {
+      console.error('Google Sign-in error:', err.message);
+      throw err;
     }
-    await supabaseGoogleLogin();
   };
 
   const signOut = async () => {
