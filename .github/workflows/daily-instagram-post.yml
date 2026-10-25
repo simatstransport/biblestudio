@@ -1,0 +1,24 @@
+name: Daily Instagram Scripture Post
+
+on:
+  schedule:
+    # Runs every day at 05:00 UTC (10:30 AM IST / 1:00 AM EST)
+    - cron: '0 5 * * *'
+  # Allows manual triggering from the GitHub Actions tab anytime
+  workflow_dispatch:
+
+jobs:
+  post-to-instagram:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Daily Scripture Post
+        env:
+          STUDIO_API_URL: ${{ secrets.STUDIO_API_URL || 'https://faith-creator-studio.vercel.app' }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+        run: |
+          curl -X POST "$STUDIO_API_URL/api/instagram/trigger-daily" \
+            -H "Content-Type: application/json" \
+            -H "x-cron-secret: $CRON_SECRET" \
+            -d "{\"igUserId\": \"$INSTAGRAM_USER_ID\", \"accessToken\": \"$INSTAGRAM_ACCESS_TOKEN\", \"languageMode\": \"bilingual\"}"
