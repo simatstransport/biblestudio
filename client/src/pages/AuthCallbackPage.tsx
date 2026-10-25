@@ -11,17 +11,37 @@ export const AuthCallbackPage: React.FC = () => {
   useEffect(() => {
     async function handleAuth() {
       try {
+        const searchParams = new URLSearchParams(window.location.search);
+        const errDesc = searchParams.get('error_description') || searchParams.get('error');
+        if (errDesc) {
+          throw new Error(errDesc);
+        }
+
         if (supabase) {
+          // Explicitly exchange PKCE code if present
+          const code = searchParams.get('code');
+          if (code) {
+            try {
+              await supabase.auth.exchangeCodeForSession(window.location.href);
+            } catch (exchangeErr: any) {
+              console.warn('Code exchange note:', exchangeErr.message);
+            }
+          }
+
           const { data, error } = await supabase.auth.getSession();
           if (error) throw error;
 
           if (data.session) {
             setStatus('Checking your AI Studio configuration...');
-            const settings = await api.getAISettings();
-            if (settings.configured) {
+            try {
+              const settings = await api.getAISettings();
+              if (settings.configured) {
+                navigate('/dashboard');
+              } else {
+                navigate('/onboarding');
+              }
+            } catch {
               navigate('/dashboard');
-            } else {
-              navigate('/onboarding');
             }
             return;
           }
@@ -31,7 +51,7 @@ export const AuthCallbackPage: React.FC = () => {
         navigate('/dashboard');
       } catch (err: any) {
         console.error('Auth callback error:', err.message);
-        navigate('/login');
+        navigate(`/login?error=${encodeURIComponent(err.message)}`);
       }
     }
 

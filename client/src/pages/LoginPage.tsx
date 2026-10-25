@@ -10,6 +10,17 @@ export const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const errCode = params.get('error_code');
+    const errDesc = params.get('error_description') || params.get('error');
+    if (errCode === 'bad_oauth_state' || (errDesc && errDesc.includes('OAuth state'))) {
+      setError("OAuth State Expired/Not Found. Please add 'http://localhost:3000/**' to your Supabase Redirect URLs in Supabase Dashboard (Auth -> URL Configuration), or use Instant Evaluation Mode below.");
+    } else if (errDesc) {
+      setError(errDesc);
+    }
+  }, []);
+
   const handleGoogleLogin = async () => {
     try {
       setLoading(true);
