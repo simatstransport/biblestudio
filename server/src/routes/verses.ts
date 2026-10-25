@@ -46,3 +46,14 @@ versesRouter.get('/search', requireAuth, async (req: Request, res: Response, nex
     next(err);
   }
 });
+
+// POST /api/verses/detect-nuances
+versesRouter.post('/detect-nuances', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { reference, text } = req.body;
+    const nuances = VerseService.detectNuances(reference || '', text || '');
+    return res.json({ success: true, data: nuances });
+  } catch (err) {
+    next(err);
+  }
+});

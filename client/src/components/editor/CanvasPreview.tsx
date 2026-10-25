@@ -72,17 +72,27 @@ export const CanvasPreview: React.FC<CanvasPreviewProps> = ({
     }
     // Presets
     switch (background.value) {
-      case 'jesus_embrace':
+      case 'calvary_cross':
+      case 'cross_silhouette':
         return {
-          backgroundImage: `url('/presets/jesus_embrace.jpg')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          background: 'linear-gradient(180deg, #080314 0%, #2D112B 35%, #732B2B 65%, #D47A37 85%, #FFD175 100%)'
         };
+      case 'peaceful_shepherd':
+        return {
+          background: 'linear-gradient(180deg, #0F2027 0%, #203A43 40%, #2C5364 70%, #E0C38A 90%, #F9E4B7 100%)'
+        };
+      case 'heavenly_temple':
       case 'solomon_temple':
         return {
-          backgroundImage: `url('/presets/solomon_temple.jpg')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          background: 'radial-gradient(circle at 20% 20%, #FFEAA7 0%, #D4AF37 30%, #3D2906 65%, #060914 100%)'
+        };
+      case 'storm_breakthrough':
+        return {
+          background: 'linear-gradient(180deg, #04070F 0%, #0C1527 45%, #1B283D 75%, #080C14 100%)'
+        };
+      case 'jesus_embrace':
+        return {
+          background: 'radial-gradient(circle at 50% 35%, #FFE082 0%, #FFB300 30%, #5D4037 70%, #1A120B 100%)'
         };
       case 'heavenly_gold':
         return {

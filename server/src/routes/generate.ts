@@ -12,6 +12,7 @@ import {
 } from '../validators/schemas.js';
 import { createRouterForUser } from '../services/routerFactory.js';
 import { ImageCompositionService } from '../services/imageCompositionService.js';
+import { VerseService } from '../services/verseService.js';
 import { getSupabaseAdmin } from '../services/supabaseService.js';
 import { config } from '../config/index.js';
 
@@ -154,7 +155,7 @@ generateRouter.post('/image', requireAuth, async (req: Request, res: Response, n
     // Engineer prompt for photorealistic quality with zero text distortions
     let engineeredPrompt = input.prompt.trim();
     if (input.type === 'spiritual_background' || /bible|scripture|verse|god|lord|jesus|temple|heaven|holiness|divine|psalm|altar/i.test(input.prompt)) {
-      engineeredPrompt = `Photorealistic 8K cinematic biblical scene: ${input.prompt}. Ancient Jerusalem temple atmosphere, majestic stone pillars, celestial heavenly god rays beam down from above, golden crown resting on deep royal blue velvet cloth, warm golden dust motes, dramatic chiaroscuro Rembrandt lighting, awe-inspiring sacred majesty. Pure cinematic background image, zero text, no letters, no words, no subtitles, no watermarks, 8K hyper-detailed wallpaper.`;
+      engineeredPrompt = `Photorealistic 8K cinematic biblical scene: ${input.prompt}. Ethereal volumetric divine lighting, authentic reverent atmosphere, dramatic cinematic depth, clean negative space reserved for typography overlay. Pure cinematic background image, zero text, no letters, no words, no subtitles, no watermarks, 8K hyper-detailed wallpaper.`;
     } else {
       engineeredPrompt = `Ultra-dynamic 2026 YouTube thumbnail background: ${input.prompt}. High contrast, cinematic studio lighting, dramatic color palette, electric rim lighting, clean negative space on side for large text overlay, sharp depth of field, 8K resolution, zero text, no words, no letters, no typography, no watermarks.`;
     }
@@ -178,7 +179,17 @@ generateRouter.post('/image', requireAuth, async (req: Request, res: Response, n
     } catch (aiErr: any) {
       console.warn('AI image generation unavailable, returning recommended preset background:', aiErr.message);
       // Fallback gracefully to high-res spiritual preset background
-      const fallbackPreset = isSolomonRequest || input.type === 'spiritual_background' ? 'solomon_temple' : 'cinematic_bold';
+      const pLower = input.prompt.toLowerCase();
+      let fallbackPreset = 'calvary_cross';
+      if (/temple|solomon|sanctuary|altar|1 kings/i.test(pLower)) {
+        fallbackPreset = 'heavenly_temple';
+      } else if (/shepherd|psalm 23|pasture|still waters|green/i.test(pLower)) {
+        fallbackPreset = 'peaceful_shepherd';
+      } else if (/storm|sea|boat|water|waves/i.test(pLower)) {
+        fallbackPreset = 'storm_breakthrough';
+      } else if (/mountain|sinai|rock|fortress/i.test(pLower)) {
+        fallbackPreset = 'sunrise_mountains';
+      }
       return res.json({
         success: true,
         presetFallback: true,
@@ -325,13 +336,19 @@ Respond with pure JSON only matching this schema:
   "designRationale": "Why this composition, visual subject, and typography placement were selected for this specific scripture"
 }`;
 
+        // Auto-deduce nuances if user left them empty
+    const autoNuances = VerseService.detectNuances(input.verseReference, input.verseText);
+    const resolvedPurpose = input.purposeOrTheme || autoNuances.themeTitle;
+    const resolvedAtmosphere = input.atmosphere || autoNuances.atmosphere;
+    const resolvedVisualPref = input.visualPreferences || autoNuances.visualPreferences;
+
     const userPrompt = `Scripture Reference: ${input.verseReference}
 Verse Text: "${input.verseText}"
 Language Mode: ${input.language}
-Poster Purpose: ${input.purposeOrTheme || 'Auto-deduced from scripture context'}
+Poster Purpose: ${resolvedPurpose}
 Preferred Translation: ${input.translation || 'Canonical'}
-Desired Atmosphere: ${input.atmosphere || 'Autonomously deduce the most fitting, awe-inspiring atmosphere from the verse context'}
-Visual Preferences: ${input.visualPreferences || 'Autonomously select the most authentic biblical scene uniquely suited to this verse'}
+Desired Atmosphere: ${resolvedAtmosphere}
+Visual Preferences: ${resolvedVisualPref}
 Additional Caption Request: ${input.additionalCaption || 'None'}`;
 
     const briefResult = await router.generateText({
@@ -368,11 +385,21 @@ Additional Caption Request: ${input.additionalCaption || 'None'}`;
       artworkUrl = imgRes.imageUrl || '';
       imageProvider = imgRes.provider;
     } catch (imgErr: any) {
-      console.warn('Live image generation failed, using curated studio background:', imgErr.message);
-      if (/jesus|embrace|shepherd|comfort/i.test(brief.visualConcept || input.visualPreferences || '')) {
-        artworkUrl = '/presets/jesus_embrace.jpg';
+      console.warn('Live image generation fallback to procedural theme:', imgErr.message);
+      const textToScan = `${input.verseReference} ${input.verseText} ${brief.visualConcept || ''} ${input.purposeOrTheme || ''}`.toLowerCase();
+
+      if (/john 3:16|cross|calvary|crucifix|sacrific|blood|salvation|savior|redeem|loved the world/i.test(textToScan)) {
+        artworkUrl = 'calvary_cross';
+      } else if (/shepherd|psalm 23|pasture|still waters|green|sheep|flock|leadeth/i.test(textToScan)) {
+        artworkUrl = 'peaceful_shepherd';
+      } else if (/temple|solomon|sanctuary|altar|holiness|priest|incense|ark of|1 kings/i.test(textToScan)) {
+        artworkUrl = 'heavenly_temple';
+      } else if (/storm|sea|boat|water|waves|drown|fear not|overcome/i.test(textToScan)) {
+        artworkUrl = 'storm_breakthrough';
+      } else if (/mountain|sinai|rock|fortress|climb|strength|zion/i.test(textToScan)) {
+        artworkUrl = 'sunrise_mountains';
       } else {
-        artworkUrl = '/presets/solomon_temple.jpg';
+        artworkUrl = 'calvary_cross';
       }
     }
 
@@ -553,7 +580,7 @@ Additional Caption Request: ${input.additionalCaption || 'None'}`;
       scrimType: isRightSide ? 'right' : 'top',
       background: {
         type: artworkUrl.startsWith('http') || artworkUrl.startsWith('data:') ? 'image' : 'preset',
-        value: artworkUrl.startsWith('http') || artworkUrl.startsWith('data:') ? artworkUrl : artworkUrl.includes('jesus') ? 'jesus_embrace' : 'solomon_temple'
+        value: artworkUrl
       },
       texts,
       images: []

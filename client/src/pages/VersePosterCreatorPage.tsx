@@ -24,15 +24,169 @@ import { Navbar } from '../components/layout/Navbar.js';
 import { api } from '../services/api.js';
 import { TextOverlay } from '../types/index.js';
 
+// Popular Quick Select Scriptures with verified texts & authentic visual concepts
+const POPULAR_VERSES = [
+  {
+    ref: 'John 3:16',
+    label: 'John 3:16 (Love & Cross)',
+    english: 'For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.',
+    tamil: 'தேவன், தம்முடைய ஒரேபேறான குமாரனை விசுவாசிக்கிறவன் எவனோ அவன் கெட்டுப்போகாமல் நித்தியஜீவனை அடையும்படிக்கு, அவரைத் தந்தருளி, இவ்வளவாய் உலகத்தில் அன்புகூர்ந்தார்.',
+    theme: "God's Boundless Love & Eternal Salvation",
+    atmosphere: "Sacrificial love, radiant hope, eternal grace, celestial warmth",
+    visual: "Mount Calvary silhouette with the holy cross bathed in radiant dawn golden rays and ethereal morning clouds"
+  },
+  {
+    ref: 'Psalm 23:1',
+    label: 'Psalm 23:1 (Good Shepherd)',
+    english: 'The LORD is my shepherd; I shall not want.',
+    tamil: 'கர்த்தர் என் மேய்ப்பராயிருக்கிறார்; நான் தாழ்ச்சியடையேன்.',
+    theme: "The Lord My Shepherd & Restorer",
+    atmosphere: "Peaceful, tranquil, restoring, deep serene stillness",
+    visual: "Gentle shepherd with staff beside tranquil still waters and lush green pastures under golden morning light"
+  },
+  {
+    ref: 'Matthew 11:28',
+    label: 'Matthew 11:28 (Rest & Embrace)',
+    english: 'Come unto me, all ye that labour and are heavy laden, and I will give you rest.',
+    tamil: 'வருத்தப்பட்டுப் பாரஞ்சுமக்கிறவர்களே! நீங்கள் எல்லாரும் என்னிடத்தில் வாருங்கள்; நான் உங்களுக்கு இளைப்பாறுதல் தருவேன்.',
+    theme: "Divine Rest & Tender Compassion",
+    atmosphere: "Warm, peaceful, intimate divine presence, golden hour glow",
+    visual: "Jesus embracing a young believer tenderly with golden backlight"
+  },
+  {
+    ref: 'Jeremiah 29:11',
+    label: 'Jeremiah 29:11 (Hope & Future)',
+    english: 'For I know the thoughts that I think toward you, saith the LORD, thoughts of peace, and not of evil, to give you an expected end.',
+    tamil: 'நீங்கள் எதிர்பார்த்திருக்கும் முடிவை உங்களுக்குக் கொடுக்கும்படிக்கு நான் உங்களைக்குறித்து நினைத்திருக்கிற நினைவுகளை அறிவேன் என்று கர்த்தர் சொல்லுகிறார்; அவைகள் தீமைக்கல்ல, சமாதானத்துக்கேதுவான நினைவுகளே.',
+    theme: "Hope, Divine Purpose & Expected End",
+    atmosphere: "Uplifting assurance, serene peace, bright horizon glow",
+    visual: "Tranquil winding pathway opening toward a radiant sunrise over hills of promise"
+  },
+  {
+    ref: 'Philippians 4:13',
+    label: 'Phil 4:13 (Strength in Christ)',
+    english: 'I can do all things through Christ which strengtheneth me.',
+    tamil: 'என்னைப் பெலப்படுத்துகிற கிறிஸ்துவினாலே எல்லாவற்றையுஞ்செய்ய எனக்குப் பெலனுண்டு.',
+    theme: "Strength & Triumph Through Christ",
+    atmosphere: "Empowering divine energy, soaring victory, celestial brilliance",
+    visual: "Glorious golden eagle soaring above rugged mountain peaks bathed in brilliant sunrise"
+  },
+  {
+    ref: '1 Kings 8:15',
+    label: '1 Kings 8:15 (Temple & Covenant)',
+    english: 'Blessed be the LORD God of Israel, which spake with his mouth unto David my father, and hath with his hand fulfilled it, saying,',
+    tamil: 'அவர் என் தகப்பனாகிய தாவீதோடே தம்முடைய வாக்கினால் சொன்னதை தம்முடைய கரத்தினால் நிறைவேற்றி, சொல்லியதாவது: இஸ்ரவேலின் தேவனாகிய கர்த்தருக்கு ஸ்தோத்திரம்.',
+    theme: "Faithfulness & Sacred Covenant",
+    atmosphere: "Reverent awe, majestic, sacred temple worship",
+    visual: "Ancient Solomon's temple stone colonnade with celestial sun rays breaking through incense mist"
+  }
+];
+
+export function detectLocalNuances(ref: string, text?: string): {
+  themeTitle: string;
+  atmosphere: string;
+  visualPreferences: string;
+} {
+  const normRef = ref.toLowerCase().replace(/\s+/g, '');
+  const match = POPULAR_VERSES.find(v => v.ref.toLowerCase().replace(/\s+/g, '') === normRef);
+  if (match) {
+    return {
+      themeTitle: match.theme,
+      atmosphere: match.atmosphere,
+      visualPreferences: match.visual
+    };
+  }
+
+  const combined = `${ref} ${text || ''}`.toLowerCase();
+
+  if (/john 3:16|cross|calvary|crucifix|salvation|savior|redeem|loved the world|gave his only|sacrific/i.test(combined)) {
+    return {
+      themeTitle: "God's Boundless Love & Eternal Salvation",
+      atmosphere: "Sacrificial love, radiant hope, eternal grace, celestial warmth",
+      visualPreferences: "Mount Calvary silhouette with the holy cross bathed in radiant dawn golden rays and ethereal morning clouds"
+    };
+  }
+
+  if (/labour|labor|heavy laden|rest|gentle|embrace|weary|burden|matthew 11/i.test(combined)) {
+    return {
+      themeTitle: "Divine Rest & Tender Compassion",
+      atmosphere: "Warm, peaceful, intimate divine presence, golden hour glow",
+      visualPreferences: "Jesus embracing a young believer tenderly with golden backlight"
+    };
+  }
+
+  if (/shepherd|pasture|still waters|green pastures|restore|psalm 23/i.test(combined)) {
+    return {
+      themeTitle: "The Lord My Shepherd & Restorer",
+      atmosphere: "Peaceful, tranquil, restoring, deep serene stillness",
+      visualPreferences: "Gentle shepherd with staff beside tranquil still waters and lush green pastures under golden morning light"
+    };
+  }
+
+  if (/temple|solomon|sanctuary|altar|ark of|covenant|1 kings|chronicles|priest/i.test(combined)) {
+    return {
+      themeTitle: "Faithfulness & Sacred Covenant",
+      atmosphere: "Reverent awe, majestic, sacred temple worship",
+      visualPreferences: "Ancient Solomon's temple stone colonnade with celestial sun rays breaking through incense mist"
+    };
+  }
+
+  if (/storm|waves|sea|boat|water|drown|fear not|overcome|wind|matthew 14/i.test(combined)) {
+    return {
+      themeTitle: "Breakthrough & Deliverance in the Storm",
+      atmosphere: "Dramatic breakthrough, divine authority over fear, triumphant calm",
+      visualPreferences: "Stormy Galilean waves parting under a focused beam of celestial golden sunlight"
+    };
+  }
+
+  if (/strength|strong|courage|eagles|mount up|not faint|philippians 4|isaiah 40/i.test(combined)) {
+    return {
+      themeTitle: "Strength, Renewal & Triumph Through Christ",
+      atmosphere: "Empowering divine energy, soaring victory, celestial brilliance",
+      visualPreferences: "Glorious golden eagle soaring above rugged mountain peaks bathed in brilliant sunrise"
+    };
+  }
+
+  if (/refuge|fortress|shadow|almighty|wings|shield|psalm 91/i.test(combined)) {
+    return {
+      themeTitle: "Under the Shadow of the Almighty",
+      atmosphere: "Invincible security, sacred peace, luminous golden aura",
+      visualPreferences: "Ancient stone fortress perched high on a cliff enveloped in protective celestial light"
+    };
+  }
+
+  if (/peace|careful for nothing|anxious|anxiety|philippians 4:6/i.test(combined)) {
+    return {
+      themeTitle: "The Peace That Surpasses Understanding",
+      atmosphere: "Gentle stillness, calming tranquility, soft golden dusk",
+      visualPreferences: "Quiet tranquil olive grove with soft radiant light filtering through gentle leaves"
+    };
+  }
+
+  if (/trust|heart|understanding|direct thy paths|proverbs 3/i.test(combined)) {
+    return {
+      themeTitle: "Trust in the Lord with All Your Heart",
+      atmosphere: "Serene guidance, clear path, bright horizon glow",
+      visualPreferences: "A straight sunlit stone path cutting smoothly through an ancient forest toward radiant daylight"
+    };
+  }
+
+  return {
+    themeTitle: "Divine Grace & Everlasting Promise",
+    atmosphere: "Celestial warmth, peaceful reverent presence, golden dawn glow",
+    visualPreferences: "Ethereal sunrise over biblical hills with glorious parting clouds and radiant divine light"
+  };
+}
+
 export const VersePosterCreatorPage: React.FC = () => {
-  // 1. User Input Form State
-  const [verseReference, setVerseReference] = useState('1 Kings 8:15');
-  const [verseText, setVerseText] = useState('Blessed be the LORD God of Israel, which spake with his mouth unto David my father, and hath with his hand fulfilled it, saying,');
+  // 1. User Input Form State - Defaults cleanly to John 3:16 with automatic matching theme
+  const [verseReference, setVerseReference] = useState('John 3:16');
+  const [verseText, setVerseText] = useState('For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.');
   const [language, setLanguage] = useState<'english' | 'tamil' | 'bilingual'>('english');
-  const [purposeOrTheme, setPurposeOrTheme] = useState('');
+  const [purposeOrTheme, setPurposeOrTheme] = useState("God's Boundless Love & Eternal Salvation");
   const [translation, setTranslation] = useState('King James Version (KJV)');
-  const [atmosphere, setAtmosphere] = useState('');
-  const [visualPreferences, setVisualPreferences] = useState('');
+  const [atmosphere, setAtmosphere] = useState('Sacrificial love, radiant hope, eternal grace, celestial warmth');
+  const [visualPreferences, setVisualPreferences] = useState('Mount Calvary silhouette with the holy cross bathed in radiant dawn golden rays and ethereal morning clouds');
   const [additionalCaption, setAdditionalCaption] = useState('');
   const [aspectRatio, setAspectRatio] = useState<'4:5' | '1:1' | '9:16'>('4:5');
 
@@ -71,6 +225,29 @@ export const VersePosterCreatorPage: React.FC = () => {
     'Finalizing Ultra-HD design...'
   ];
 
+  // Quick Select Preset Verse
+  const handleSelectPopularVerse = (preset: typeof POPULAR_VERSES[0]) => {
+    setVerseReference(preset.ref);
+    if (language === 'tamil') {
+      setVerseText(preset.tamil);
+    } else if (language === 'bilingual') {
+      setVerseText(`${preset.english}\n\n${preset.tamil}`);
+    } else {
+      setVerseText(preset.english);
+    }
+    setPurposeOrTheme(preset.theme);
+    setAtmosphere(preset.atmosphere);
+    setVisualPreferences(preset.visual);
+  };
+
+  // Auto-Detect & Update Theme & Visual Concept from Current Verse
+  const handleAutoDetectNuances = () => {
+    const nuances = detectLocalNuances(verseReference, verseText);
+    setPurposeOrTheme(nuances.themeTitle);
+    setAtmosphere(nuances.atmosphere);
+    setVisualPreferences(nuances.visualPreferences);
+  };
+
   // Auto-Fetch Verse from Database / API
   const handleLookupVerse = async () => {
     if (!verseReference.trim()) return;
@@ -86,18 +263,18 @@ export const VersePosterCreatorPage: React.FC = () => {
         } else {
           setVerseText(res.data.english.text);
         }
-        if (res.data.topic) {
-          setPurposeOrTheme(res.data.topic.charAt(0).toUpperCase() + res.data.topic.slice(1));
-        } else {
-          setPurposeOrTheme('');
-        }
-        setAtmosphere('');
-        setVisualPreferences('');
+
+        // Auto-adapt theme, atmosphere, and visual concept
+        const nuances = detectLocalNuances(res.data.reference, res.data.english.text);
+        setPurposeOrTheme(res.data.themeTitle || nuances.themeTitle);
+        setAtmosphere(res.data.suggestedAtmosphere || nuances.atmosphere);
+        setVisualPreferences(res.data.suggestedVisualConcept || nuances.visualPreferences);
       } else {
-        alert('Could not find canonical verse matching that reference. You can type or paste the exact verse text below.');
+        // Fallback for custom verses not in the verified list
+        handleAutoDetectNuances();
       }
     } catch {
-      alert('Could not find canonical verse matching that reference. You can type or paste the exact verse text below.');
+      handleAutoDetectNuances();
     } finally {
       setIsSearchingVerse(false);
     }
@@ -121,14 +298,20 @@ export const VersePosterCreatorPage: React.FC = () => {
       const stageTimer2 = setTimeout(() => setGenerationStage(2), 3800);
       const stageTimer3 = setTimeout(() => setGenerationStage(3), 8500);
 
+      // Ensure nuances match verse if user left anything blank
+      const currentNuances = detectLocalNuances(verseReference, verseText);
+      const finalTheme = purposeOrTheme.trim() || currentNuances.themeTitle;
+      const finalAtmosphere = atmosphere.trim() || currentNuances.atmosphere;
+      const finalVisual = visualPreferences.trim() || currentNuances.visualPreferences;
+
       const res = await api.generatePosterAI({
         verseReference,
         verseText,
         language,
-        purposeOrTheme,
+        purposeOrTheme: finalTheme,
         translation,
-        atmosphere,
-        visualPreferences,
+        atmosphere: finalAtmosphere,
+        visualPreferences: finalVisual,
         additionalCaption,
         aspectRatio
       });
@@ -300,7 +483,7 @@ export const VersePosterCreatorPage: React.FC = () => {
                     type="text"
                     value={verseReference}
                     onChange={(e) => setVerseReference(e.target.value)}
-                    placeholder="e.g. 1 Kings 8:15, John 3:16, Psalm 23:1"
+                    placeholder="e.g. John 3:16, Psalm 23:1, Matthew 11:28"
                     className="flex-1 bg-navy-950 border border-navy-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500 font-semibold"
                   />
                   <button
@@ -311,6 +494,29 @@ export const VersePosterCreatorPage: React.FC = () => {
                     {isSearchingVerse ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Search className="w-3.5 h-3.5" />}
                     <span>Lookup</span>
                   </button>
+                </div>
+
+                {/* Popular Quick Select Chips */}
+                <div className="mt-2.5">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1.5">
+                    Quick Scripture Select:
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {POPULAR_VERSES.map((v) => (
+                      <button
+                        key={v.ref}
+                        type="button"
+                        onClick={() => handleSelectPopularVerse(v)}
+                        className={`text-[11px] px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
+                          verseReference.toLowerCase().replace(/\s+/g, '') === v.ref.toLowerCase().replace(/\s+/g, '')
+                            ? 'bg-gold-500/20 border-gold-500 text-gold-300 font-bold shadow-sm'
+                            : 'bg-navy-950 border-navy-800 text-slate-400 hover:text-slate-200 hover:border-navy-700'
+                        }`}
+                      >
+                        {v.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
@@ -354,14 +560,17 @@ export const VersePosterCreatorPage: React.FC = () => {
 
               {/* Devotional Purpose or Theme */}
               <div>
-                <label className="block text-xs font-semibold text-slate-200 mb-1">
-                  Devotional Purpose or Theme <span className="text-slate-500 font-normal">(Optional)</span>
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-semibold text-slate-200">
+                    Devotional Purpose or Theme
+                  </label>
+                  <span className="text-[10px] text-gold-400 font-medium">Auto-derived from verse</span>
+                </div>
                 <input
                   type="text"
                   value={purposeOrTheme}
                   onChange={(e) => setPurposeOrTheme(e.target.value)}
-                  placeholder="e.g. God's faithfulness, intimate comfort, victory (Leave blank for AI auto-deduction)"
+                  placeholder="Auto-derived according to scripture (e.g. God's Boundless Love & Salvation)"
                   className="w-full bg-navy-950 border border-navy-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500"
                 />
               </div>
@@ -399,13 +608,19 @@ export const VersePosterCreatorPage: React.FC = () => {
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-300">
                   Optional Creative Nuances
                 </span>
-                <span className="text-[10px] text-gold-400 font-medium">
-                  Auto-adapts to each verse
-                </span>
+                <button
+                  type="button"
+                  onClick={handleAutoDetectNuances}
+                  className="text-[10px] text-gold-400 hover:text-gold-300 font-semibold flex items-center space-x-1 cursor-pointer bg-gold-500/10 hover:bg-gold-500/20 border border-gold-500/30 px-2 py-0.5 rounded-lg transition-all"
+                  title="Auto-detect atmosphere and visual concept matching this verse"
+                >
+                  <Wand2 className="w-3 h-3" />
+                  <span>Auto-Detect from Verse</span>
+                </button>
               </div>
 
               <p className="text-[11px] text-slate-400 leading-relaxed">
-                Leave these empty to let AI autonomously analyze the scripture to determine the most fitting atmosphere and visual subject.
+                These creative parameters adapt automatically to each scripture. You can edit them or leave them as dynamically suggested.
               </p>
 
               <div className="space-y-3 pt-1">
@@ -417,7 +632,7 @@ export const VersePosterCreatorPage: React.FC = () => {
                     type="text"
                     value={atmosphere}
                     onChange={(e) => setAtmosphere(e.target.value)}
-                    placeholder="Leave blank for AI auto-deduction (e.g. peaceful, majestic, reverent, comforting)"
+                    placeholder="e.g. Sacrificial love, radiant hope, eternal grace, celestial warmth"
                     className="w-full bg-navy-950 border border-navy-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold-500"
                   />
                 </div>
@@ -426,15 +641,26 @@ export const VersePosterCreatorPage: React.FC = () => {
                   <label className="block text-[11px] text-slate-300 mb-1">
                     Visual Concept Preferences <span className="text-slate-500 font-normal">(Optional)</span>
                   </label>
-                  <input
-                    type="text"
+                  <textarea
+                    rows={2}
                     value={visualPreferences}
                     onChange={(e) => setVisualPreferences(e.target.value)}
-                    placeholder="Leave blank for AI auto-deduction (e.g. Good Shepherd, Temple, Sea of Galilee, Mount Sinai)"
-                    className="w-full bg-navy-950 border border-navy-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold-500"
+                    placeholder="e.g. Mount Calvary silhouette with holy cross bathed in radiant dawn golden rays"
+                    className="w-full bg-navy-950 border border-navy-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold-500 leading-relaxed font-sans"
                   />
                 </div>
               </div>
+            </div>
+
+            {/* Dynamic AI Scene & Concept Preview Pill */}
+            <div className="p-3.5 bg-navy-950/80 border border-gold-500/20 rounded-2xl space-y-1.5">
+              <div className="flex items-center space-x-1.5 text-gold-400 text-xs font-bold">
+                <Sparkles className="w-3.5 h-3.5 text-gold-400 shrink-0" />
+                <span>Scripture-Adaptive Scene Concept</span>
+              </div>
+              <p className="text-[11px] text-slate-300 leading-relaxed">
+                <strong className="text-gold-300">{purposeOrTheme || 'Divine Grace'}:</strong> {visualPreferences || atmosphere || 'Cinematic sacred vista bathed in celestial golden light.'}
+              </p>
             </div>
 
             {/* Primary Action Button */}
@@ -501,131 +727,144 @@ export const VersePosterCreatorPage: React.FC = () => {
                     />
                   </div>
 
-                  {/* Primary Action Buttons */}
-                  <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-5">
-                    <button
-                      onClick={handleDownload}
-                      className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-gold-500 to-amber-400 text-navy-950 font-bold text-xs flex items-center justify-center space-x-1.5 shadow-md hover:scale-[1.02] transition-all cursor-pointer"
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                      <span>Download PNG</span>
-                    </button>
+                  {/* Creative Rationale Callout */}
+                  {result.creativeBrief?.designRationale && (
+                    <div className="mt-4 p-3 bg-navy-950 border border-navy-800 rounded-xl text-left w-full">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-gold-400 block mb-1">
+                        AI Design Rationale:
+                      </span>
+                      <p className="text-xs text-slate-300 leading-relaxed italic">
+                        "{result.creativeBrief.designRationale}"
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Action Bar */}
+                  <div className="flex flex-wrap items-center justify-between gap-3 w-full mt-5 pt-4 border-t border-navy-800">
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={handleDownload}
+                        className="px-4 py-2.5 rounded-xl bg-gold-500 hover:bg-gold-400 text-navy-950 font-bold text-xs flex items-center space-x-1.5 shadow-lg shadow-gold-500/20 transition-all cursor-pointer"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>Download 4K PNG</span>
+                      </button>
+
+                      <button
+                        onClick={handleSaveProject}
+                        disabled={isSavingProject}
+                        className="px-3.5 py-2.5 rounded-xl bg-navy-800 hover:bg-navy-700 text-white font-semibold text-xs border border-navy-700 flex items-center space-x-1.5 transition-all cursor-pointer disabled:opacity-50"
+                      >
+                        <Save className="w-3.5 h-3.5 text-slate-300" />
+                        <span>{isSavingProject ? 'Saving...' : 'Save to Projects'}</span>
+                      </button>
+                    </div>
 
                     <button
                       onClick={handlePublishToInstagram}
                       disabled={isPublishingIg}
-                      className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-pink-600 via-purple-600 to-orange-500 text-white font-bold text-xs flex items-center justify-center space-x-1.5 shadow-md hover:scale-[1.02] transition-all cursor-pointer disabled:opacity-50"
+                      className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 text-white font-bold text-xs flex items-center space-x-2 shadow-lg shadow-pink-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50"
                     >
-                      {isPublishingIg ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Instagram className="w-3.5 h-3.5" />}
-                      <span>Post to Instagram</span>
-                    </button>
-
-                    <button
-                      onClick={handleGenerateAI}
-                      className="py-2.5 px-3 rounded-xl bg-navy-800 hover:bg-navy-700 border border-navy-700 text-slate-200 font-semibold text-xs flex items-center justify-center space-x-1.5 transition-colors cursor-pointer"
-                    >
-                      <Wand2 className="w-3.5 h-3.5 text-gold-400" />
-                      <span>New Concept</span>
-                    </button>
-
-                    <button
-                      onClick={handleSaveProject}
-                      disabled={isSavingProject}
-                      className="py-2.5 px-3 rounded-xl bg-navy-800 hover:bg-navy-700 border border-navy-700 text-slate-200 font-semibold text-xs flex items-center justify-center space-x-1.5 transition-colors cursor-pointer"
-                    >
-                      <Save className="w-3.5 h-3.5 text-gold-400" />
-                      <span>{isSavingProject ? 'Saving...' : 'Save Project'}</span>
+                      {isPublishingIg ? (
+                        <>
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                          <span>Publishing to Instagram...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Instagram className="w-3.5 h-3.5" />
+                          <span>Publish to Instagram</span>
+                        </>
+                      )}
                     </button>
                   </div>
 
                   {/* Instagram Success Alert */}
                   {igSuccessMessage && (
-                    <div className="w-full mt-3 p-3 bg-emerald-950/60 border border-emerald-500/50 rounded-xl flex items-center space-x-2 text-xs text-emerald-200">
+                    <div className="mt-3 w-full p-3 bg-emerald-950/60 border border-emerald-500/50 rounded-xl flex items-center space-x-2 text-xs text-emerald-200">
                       <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                       <span>{igSuccessMessage}</span>
                     </div>
                   )}
                 </div>
 
-                {/* AI Design Decision Card */}
-                {result.creativeBrief && (
-                  <div className="w-full bg-navy-900 border border-navy-800 rounded-2xl p-5 shadow-xl space-y-3">
-                    <div className="flex items-center justify-between pb-2 border-b border-navy-800">
-                      <span className="text-xs font-bold uppercase tracking-wider text-gold-400 flex items-center space-x-1.5">
-                        <Sparkles className="w-3.5 h-3.5" />
-                        <span>AI Creative Breakdown</span>
-                      </span>
-                      <span className="text-[11px] text-slate-400">Automated Reasoning</span>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                      <div>
-                        <span className="text-[11px] text-slate-400 block">Visual Concept:</span>
-                        <p className="text-slate-200 font-medium">{result.creativeBrief.visualConcept}</p>
-                      </div>
-                      <div>
-                        <span className="text-[11px] text-slate-400 block">Atmosphere & Lighting:</span>
-                        <p className="text-slate-200 font-medium">{result.creativeBrief.lighting || result.creativeBrief.atmosphere}</p>
-                      </div>
-                    </div>
-
-                    {result.creativeBrief.designRationale && (
-                      <div className="pt-2 border-t border-navy-800/80 text-xs">
-                        <span className="text-[11px] text-slate-400 block">Design Strategy:</span>
-                        <p className="text-slate-300 italic">{result.creativeBrief.designRationale}</p>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Optional Post-Generation Editing Drawer */}
-                <div className="w-full bg-navy-900 border border-navy-800 rounded-2xl shadow-xl overflow-hidden">
+                {/* Optional Typography Finetuning Accordion */}
+                <div className="w-full bg-navy-900 border border-navy-800 rounded-2xl p-5 shadow-xl">
                   <button
                     onClick={() => setShowEditor(!showEditor)}
-                    className="w-full p-4 flex items-center justify-between text-xs font-bold text-slate-300 hover:text-white transition-colors cursor-pointer"
+                    className="w-full flex items-center justify-between text-left text-xs font-bold uppercase tracking-wider text-slate-300 cursor-pointer"
                   >
                     <span className="flex items-center space-x-2">
                       <Sliders className="w-4 h-4 text-gold-400" />
-                      <span>Optional: Fine-Tune Text or Typography</span>
+                      <span>Typography & Layout Fine-Tuning</span>
                     </span>
                     {showEditor ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                   </button>
 
                   {showEditor && (
-                    <div className="p-5 border-t border-navy-800 space-y-4">
+                    <div className="mt-4 pt-4 border-t border-navy-800 space-y-4">
                       <p className="text-xs text-slate-400">
-                        Adjust text layers directly. Updating text re-composites instantly on the AI artwork without consuming additional image generation credits.
+                        Adjust text overlay positions, font sizes, or colors directly without altering the background artwork.
                       </p>
 
                       <div className="space-y-3">
-                        {editableTexts.map((item, idx) => (
-                          <div key={item.id} className="p-3 bg-navy-950 rounded-xl border border-navy-800 space-y-2">
-                            <div className="flex items-center justify-between text-[11px] font-semibold text-slate-300">
-                              <span>Layer: {item.id}</span>
-                              <div className="flex items-center space-x-2">
-                                <span>Size: {item.fontSize}px</span>
-                                <input
-                                  type="range"
-                                  min="14"
-                                  max="48"
-                                  value={item.fontSize}
-                                  onChange={(e) => {
-                                    const val = Number(e.target.value);
-                                    setEditableTexts(prev => prev.map((t, i) => i === idx ? { ...t, fontSize: val } : t));
-                                  }}
-                                  className="w-20 accent-gold-500"
-                                />
-                              </div>
+                        {editableTexts.map((txt, index) => (
+                          <div key={txt.id || index} className="p-3 bg-navy-950 rounded-xl border border-navy-800 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-semibold text-gold-400">Layer {index + 1} ({txt.id})</span>
+                              <input
+                                type="color"
+                                value={txt.color || '#FFFFFF'}
+                                onChange={(e) => {
+                                  const updated = [...editableTexts];
+                                  updated[index].color = e.target.value;
+                                  setEditableTexts(updated);
+                                }}
+                                className="w-5 h-5 rounded cursor-pointer border-0 bg-transparent"
+                              />
                             </div>
                             <input
                               type="text"
-                              value={item.text}
+                              value={txt.text}
                               onChange={(e) => {
-                                const val = e.target.value;
-                                setEditableTexts(prev => prev.map((t, i) => i === idx ? { ...t, text: val } : t));
+                                const updated = [...editableTexts];
+                                updated[index].text = e.target.value;
+                                setEditableTexts(updated);
                               }}
                               className="w-full bg-navy-900 border border-navy-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
                             />
+                            <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-400">
+                              <div>
+                                <span>Font Size ({txt.fontSize}px)</span>
+                                <input
+                                  type="range"
+                                  min={12}
+                                  max={120}
+                                  value={txt.fontSize}
+                                  onChange={(e) => {
+                                    const updated = [...editableTexts];
+                                    updated[index].fontSize = Number(e.target.value);
+                                    setEditableTexts(updated);
+                                  }}
+                                  className="w-full"
+                                />
+                              </div>
+                              <div>
+                                <span>Vertical Position ({Math.round(txt.y)}%)</span>
+                                <input
+                                  type="range"
+                                  min={0}
+                                  max={100}
+                                  value={txt.y}
+                                  onChange={(e) => {
+                                    const updated = [...editableTexts];
+                                    updated[index].y = Number(e.target.value);
+                                    setEditableTexts(updated);
+                                  }}
+                                  className="w-full"
+                                />
+                              </div>
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -633,10 +872,10 @@ export const VersePosterCreatorPage: React.FC = () => {
                       <button
                         onClick={handleUpdateText}
                         disabled={isUpdatingText}
-                        className="w-full py-2.5 rounded-xl bg-gold-500 hover:bg-gold-400 text-navy-950 font-bold text-xs flex items-center justify-center space-x-1.5 transition-colors cursor-pointer disabled:opacity-50"
+                        className="w-full py-2.5 rounded-xl bg-navy-800 hover:bg-gold-500/20 text-gold-400 border border-gold-500/40 text-xs font-bold flex items-center justify-center space-x-1.5 transition-all cursor-pointer disabled:opacity-50"
                       >
-                        {isUpdatingText ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
-                        <span>Update Typography Preview</span>
+                        {isUpdatingText ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                        <span>Apply Typography Updates</span>
                       </button>
                     </div>
                   )}
@@ -644,16 +883,24 @@ export const VersePosterCreatorPage: React.FC = () => {
               </div>
             ) : (
               /* Empty Placeholder State */
-              <div className="w-full bg-navy-900/60 border border-navy-800 rounded-2xl p-12 shadow-2xl flex flex-col items-center justify-center text-center space-y-4">
-                <div className="w-16 h-16 rounded-full bg-gold-500/10 border border-gold-500/20 text-gold-400 flex items-center justify-center">
-                  <Wand2 className="w-8 h-8" />
+              <div className="w-full h-full min-h-[520px] bg-navy-900/40 border-2 border-dashed border-navy-800 rounded-3xl p-8 flex flex-col items-center justify-center text-center space-y-4">
+                <div className="w-16 h-16 rounded-2xl bg-gold-500/10 border border-gold-500/20 flex items-center justify-center text-gold-400">
+                  <Sparkles className="w-8 h-8" />
                 </div>
-                <div className="max-w-sm space-y-1">
-                  <h3 className="text-base font-bold font-cinzel text-white">Your AI Poster Canvas</h3>
+                <div className="max-w-md space-y-1">
+                  <h3 className="text-lg font-bold text-white">Your Masterpiece Awaits</h3>
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    Enter your scripture reference and devotional theme on the left, then click <strong>Generate with AI</strong>. The AI will compose a bespoke visual scene and typography hierarchy.
+                    Select a scripture or enter your verse reference. The AI Creative Director will design a custom photorealistic scene and render verified scripture typography.
                   </p>
                 </div>
+                <button
+                  onClick={handleGenerateAI}
+                  disabled={isGenerating}
+                  className="px-6 py-2.5 rounded-xl bg-gold-500 hover:bg-gold-400 text-navy-950 font-bold text-xs shadow-lg shadow-gold-500/20 transition-all cursor-pointer flex items-center space-x-1.5"
+                >
+                  <Wand2 className="w-3.5 h-3.5" />
+                  <span>Generate John 3:16 Poster</span>
+                </button>
               </div>
             )}
           </div>

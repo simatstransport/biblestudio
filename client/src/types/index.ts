@@ -30,6 +30,9 @@ export interface PairedVerse {
   verseStart: number;
   verseEnd?: number;
   topic: string;
+  themeTitle?: string;
+  suggestedAtmosphere?: string;
+  suggestedVisualConcept?: string;
   english: {
     translation: string;
     text: string;

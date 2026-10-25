@@ -180,14 +180,12 @@ export class AIRouter {
   async generateImage(options: ImagePromptOptions): Promise<ImageGenerationResult> {
     const startTime = Date.now();
 
-    // Try OpenAI DALL-E 3 first if configured
-    if (this.openai) {
+    const tryOpenAI = async (): Promise<ImageGenerationResult | null> => {
+      if (!this.openai) return null;
       try {
         const result = await this.openai.generateImage(options);
         const durationMs = Date.now() - startTime;
-
         await this.recordHistory('openai', 'dall-e-3', 'image_generation', false, 'success', durationMs);
-
         return {
           imageUrl: result.url,
           mimeType: 'image/png',
@@ -197,22 +195,13 @@ export class AIRouter {
           fallbackUsed: false
         };
       } catch (err: any) {
-        const durationMs = Date.now() - startTime;
         console.warn('OpenAI image generation failed:', err.message);
-
-        const isQuota = OpenAIProvider.isQuotaError(err);
-        const isAuth = OpenAIProvider.isAuthError(err);
-        if (isAuth) {
-          throw new Error('OpenAI API key is invalid for image generation.');
-        }
-
-        // Return clear indication of failure so the studio composition fallback can kick in
-        throw new Error(`Image generation error: ${err.message}`);
+        return null;
       }
-    }
+    };
 
-    // If Gemini is configured without OpenAI
-    if (this.gemini) {
+    const tryGemini = async (): Promise<ImageGenerationResult | null> => {
+      if (!this.gemini) return null;
       try {
         const gemResult = await this.gemini.generateImage(options);
         const durationMs = Date.now() - startTime;
@@ -226,10 +215,24 @@ export class AIRouter {
           fallbackUsed: false
         };
       } catch (gemErr: any) {
-        throw new Error(`Google Imagen generation failed: ${gemErr.message}`);
+        console.warn('Google Imagen generation failed:', gemErr.message);
+        return null;
       }
+    };
+
+    // Try primary provider first, with seamless fallback to secondary
+    if (this.primaryProvider === 'gemini') {
+      const gRes = await tryGemini();
+      if (gRes) return gRes;
+      const oRes = await tryOpenAI();
+      if (oRes) return oRes;
+    } else {
+      const oRes = await tryOpenAI();
+      if (oRes) return oRes;
+      const gRes = await tryGemini();
+      if (gRes) return gRes;
     }
 
-    throw new Error('No image-capable AI provider configured. Please provide an OpenAI or Google Gemini API key in Settings.');
+    throw new Error('All configured image generation engines failed or quota reached.');
   }
 }

@@ -76,43 +76,132 @@ export class ImageCompositionService {
     let gradientSvg = '';
 
     switch (preset) {
-      case 'solomon_temple':
-      case 'heavenly_gold':
+      case 'calvary_cross':
+        // Mount Calvary with Holy Cross silhouette & radiant golden sunrise (for John 3:16, Love, Salvation)
         gradientSvg = `
           <defs>
-            <radialGradient id="grad" cx="50%" cy="25%" r="75%">
-              <stop offset="0%" stop-color="#FFE8A3" />
-              <stop offset="25%" stop-color="#D4AF37" />
-              <stop offset="60%" stop-color="#3D2E0B" />
-              <stop offset="100%" stop-color="#0B132B" />
+            <linearGradient id="calvSky" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#080314" />
+              <stop offset="35%" stop-color="#2D112B" />
+              <stop offset="65%" stop-color="#732B2B" />
+              <stop offset="85%" stop-color="#D47A37" />
+              <stop offset="100%" stop-color="#FFD175" />
+            </linearGradient>
+            <radialGradient id="crossAura" cx="${width * 0.28}" cy="${height * 0.42}" r="55%">
+              <stop offset="0%" stop-color="#FFF2A3" stop-opacity="0.9" />
+              <stop offset="25%" stop-color="#FFA834" stop-opacity="0.6" />
+              <stop offset="60%" stop-color="#D44B20" stop-opacity="0.25" />
+              <stop offset="100%" stop-color="#000000" stop-opacity="0" />
             </radialGradient>
-            <linearGradient id="ray" x1="50%" y1="0%" x2="50%" y2="100%">
-              <stop offset="0%" stop-color="rgba(255, 248, 220, 0.45)" />
-              <stop offset="100%" stop-color="rgba(212, 175, 55, 0)" />
+            <linearGradient id="beam" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="rgba(255, 245, 190, 0.45)" />
+              <stop offset="100%" stop-color="rgba(212, 122, 55, 0)" />
             </linearGradient>
           </defs>
-          <rect width="${width}" height="${height}" fill="url(#grad)" />
-          <polygon points="${width * 0.35},0 ${width * 0.65},0 ${width * 0.95},${height} ${width * 0.05},${height}" fill="url(#ray)" opacity="0.4" />
+          <rect width="${width}" height="${height}" fill="url(#calvSky)" />
+          <circle cx="${width * 0.28}" cy="${height * 0.42}" r="${width * 0.4}" fill="url(#crossAura)" />
+          
+          <!-- Volumetric Rays -->
+          <polygon points="${width * 0.28},${height * 0.42} ${width * 0.8},0 ${width * 0.95},0" fill="url(#beam)" />
+          <polygon points="${width * 0.28},${height * 0.42} ${width}, ${height * 0.3} ${width}, ${height * 0.5}" fill="url(#beam)" opacity="0.6" />
+
+          <!-- Calvary Hill Silhouette -->
+          <ellipse cx="${width * 0.28}" cy="${height * 1.05}" rx="${width * 0.55}" ry="${height * 0.3}" fill="#0A0612" />
+          <ellipse cx="${width * 0.8}" cy="${height * 1.1}" rx="${width * 0.5}" ry="${height * 0.25}" fill="#06030B" />
+
+          <!-- Holy Cross Silhouette -->
+          <rect x="${width * 0.26}" y="${height * 0.24}" width="${width * 0.045}" height="${height * 0.52}" fill="#08040F" rx="2" />
+          <rect x="${width * 0.15}" y="${height * 0.35}" width="${width * 0.26}" height="${height * 0.045}" fill="#08040F" rx="2" />
         `;
         break;
 
-      case 'deep_navy_gold':
+      case 'peaceful_shepherd':
+        // Green pastures & tranquil still waters (for Psalm 23, Peace, Comfort)
         gradientSvg = `
           <defs>
-            <radialGradient id="grad" cx="50%" cy="45%" r="80%">
-              <stop offset="0%" stop-color="#1C2D4A" />
-              <stop offset="55%" stop-color="#0B132B" />
-              <stop offset="100%" stop-color="#040711" />
+            <linearGradient id="shepSky" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#0F2027" />
+              <stop offset="40%" stop-color="#203A43" />
+              <stop offset="70%" stop-color="#2C5364" />
+              <stop offset="90%" stop-color="#E0C38A" />
+              <stop offset="100%" stop-color="#F9E4B7" />
+            </linearGradient>
+            <radialGradient id="sunGlow" cx="${width * 0.3}" cy="${height * 0.45}" r="40%">
+              <stop offset="0%" stop-color="#FFF9D2" stop-opacity="0.8" />
+              <stop offset="50%" stop-color="#E5A65D" stop-opacity="0.3" />
+              <stop offset="100%" stop-color="#000000" stop-opacity="0" />
             </radialGradient>
-            <linearGradient id="goldAcc" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#C5A059" stop-opacity="0.35"/>
-              <stop offset="100%" stop-color="#E6CA65" stop-opacity="0"/>
+          </defs>
+          <rect width="${width}" height="${height}" fill="url(#shepSky)" />
+          <circle cx="${width * 0.3}" cy="${height * 0.45}" r="${width * 0.28}" fill="url(#sunGlow)" />
+          
+          <!-- Rolling Green Hills -->
+          <path d="M0 ${height * 0.65} Q ${width * 0.3} ${height * 0.55} ${width * 0.6} ${height * 0.68} T ${width} ${height * 0.62} L ${width} ${height} L 0 ${height} Z" fill="#143026" />
+          <path d="M0 ${height * 0.72} Q ${width * 0.4} ${height * 0.64} ${width * 0.75} ${height * 0.76} T ${width} ${height * 0.7} L ${width} ${height} L 0 ${height} Z" fill="#0C1F18" />
+          
+          <!-- Still Waters Reflection -->
+          <rect y="${height * 0.82}" width="${width}" height="${height * 0.18}" fill="#0A1820" />
+          <rect y="${height * 0.82}" width="${width}" height="${height * 0.02}" fill="#C9A86A" opacity="0.4" />
+        `;
+        break;
+
+      case 'heavenly_temple':
+        // Ancient Solomon's Temple with Golden Columns & Volumetric Rays (Clean, ZERO burned text)
+        gradientSvg = `
+          <defs>
+            <radialGradient id="templeGlow" cx="20%" cy="20%" r="80%">
+              <stop offset="0%" stop-color="#FFEAA7" />
+              <stop offset="30%" stop-color="#D4AF37" />
+              <stop offset="65%" stop-color="#3D2906" />
+              <stop offset="100%" stop-color="#060914" />
+            </radialGradient>
+            <linearGradient id="colGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#140D04" />
+              <stop offset="50%" stop-color="#2D1F08" />
+              <stop offset="100%" stop-color="#0E0903" />
+            </linearGradient>
+            <linearGradient id="rayLight" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="rgba(255, 238, 170, 0.4)" />
+              <stop offset="100%" stop-color="rgba(212, 175, 55, 0)" />
             </linearGradient>
           </defs>
-          <rect width="${width}" height="${height}" fill="url(#grad)" />
-          <circle cx="${width * 0.85}" cy="${height * 0.2}" r="${width * 0.35}" fill="url(#goldAcc)" />
-          <line x1="${width * 0.1}" y1="${height * 0.08}" x2="${width * 0.9}" y2="${height * 0.08}" stroke="#C5A059" stroke-width="2" opacity="0.4" />
-          <line x1="${width * 0.1}" y1="${height * 0.92}" x2="${width * 0.9}" y2="${height * 0.92}" stroke="#C5A059" stroke-width="2" opacity="0.4" />
+          <rect width="${width}" height="${height}" fill="url(#templeGlow)" />
+          
+          <!-- Volumetric Divine Rays -->
+          <polygon points="0,0 ${width * 0.4},0 ${width * 0.95},${height} ${width * 0.2},${height}" fill="url(#rayLight)" />
+
+          <!-- Classical Temple Columns on Left -->
+          <rect x="${width * 0.04}" y="${height * 0.12}" width="${width * 0.08}" height="${height * 0.88}" fill="url(#colGrad)" />
+          <rect x="${width * 0.02}" y="${height * 0.1}" width="${width * 0.12}" height="${height * 0.03}" fill="#3A280B" />
+          
+          <rect x="${width * 0.16}" y="${height * 0.12}" width="${width * 0.08}" height="${height * 0.88}" fill="url(#colGrad)" opacity="0.9" />
+          <rect x="${width * 0.14}" y="${height * 0.1}" width="${width * 0.12}" height="${height * 0.03}" fill="#3A280B" opacity="0.9" />
+        `;
+        break;
+
+      case 'storm_breakthrough':
+        // Galilean storm with brilliant beam of divine hope
+        gradientSvg = `
+          <defs>
+            <linearGradient id="stormSky" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#04070F" />
+              <stop offset="45%" stop-color="#0C1527" />
+              <stop offset="75%" stop-color="#1B283D" />
+              <stop offset="100%" stop-color="#080C14" />
+            </linearGradient>
+            <radialGradient id="lightBeam" cx="${width * 0.35}" cy="${height * 0.3}" r="50%">
+              <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.9" />
+              <stop offset="30%" stop-color="#FFE082" stop-opacity="0.6" />
+              <stop offset="70%" stop-color="#FFB300" stop-opacity="0.2" />
+              <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+            </radialGradient>
+          </defs>
+          <rect width="${width}" height="${height}" fill="url(#stormSky)" />
+          <circle cx="${width * 0.35}" cy="${height * 0.3}" r="${width * 0.4}" fill="url(#lightBeam)" />
+          
+          <!-- Dramatic Waves -->
+          <path d="M0 ${height * 0.8} Q ${width * 0.25} ${height * 0.75} ${width * 0.5} ${height * 0.82} T ${width} ${height * 0.78} L ${width} ${height} L 0 ${height} Z" fill="#0A121D" />
+          <path d="M0 ${height * 0.88} Q ${width * 0.35} ${height * 0.82} ${width * 0.7} ${height * 0.9} T ${width} ${height * 0.85} L ${width} ${height} L 0 ${height} Z" fill="#05080E" />
         `;
         break;
 
@@ -138,45 +227,34 @@ export class ImageCompositionService {
         `;
         break;
 
-      case 'starry_night':
+      case 'deep_navy_gold':
         gradientSvg = `
           <defs>
-            <radialGradient id="grad" cx="50%" cy="30%" r="80%">
-              <stop offset="0%" stop-color="#1E2340" />
-              <stop offset="50%" stop-color="#0E101D" />
-              <stop offset="100%" stop-color="#05060A" />
+            <radialGradient id="grad" cx="50%" cy="45%" r="80%">
+              <stop offset="0%" stop-color="#1C2D4A" />
+              <stop offset="55%" stop-color="#0B132B" />
+              <stop offset="100%" stop-color="#040711" />
             </radialGradient>
           </defs>
           <rect width="${width}" height="${height}" fill="url(#grad)" />
-          <circle cx="${width * 0.15}" cy="${height * 0.15}" r="2" fill="#FFFFFF" opacity="0.9" />
-          <circle cx="${width * 0.35}" cy="${height * 0.08}" r="1.5" fill="#FFFFFF" opacity="0.7" />
-          <circle cx="${width * 0.75}" cy="${height * 0.18}" r="2.5" fill="#FFE8A3" opacity="0.95" />
-          <circle cx="${width * 0.88}" cy="${height * 0.06}" r="1.8" fill="#FFFFFF" opacity="0.8" />
-          <circle cx="${width * 0.55}" cy="${height * 0.25}" r="1.5" fill="#FFFFFF" opacity="0.6" />
         `;
         break;
 
-      case 'cinematic_bold':
+      case 'heavenly_gold':
       default:
         gradientSvg = `
           <defs>
-            <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#141E30" />
-              <stop offset="50%" stop-color="#243B55" />
-              <stop offset="100%" stop-color="#0B0E14" />
-            </linearGradient>
-            <radialGradient id="glow" cx="80%" cy="20%" r="55%">
-              <stop offset="0%" stop-color="#FF416C" stop-opacity="0.45" />
-              <stop offset="50%" stop-color="#8A2387" stop-opacity="0.25" />
-              <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+            <radialGradient id="grad" cx="50%" cy="25%" r="75%">
+              <stop offset="0%" stop-color="#FFE8A3" />
+              <stop offset="25%" stop-color="#D4AF37" />
+              <stop offset="60%" stop-color="#3D2E0B" />
+              <stop offset="100%" stop-color="#0B132B" />
             </radialGradient>
           </defs>
           <rect width="${width}" height="${height}" fill="url(#grad)" />
-          <rect width="${width}" height="${height}" fill="url(#glow)" />
         `;
         break;
     }
-
     const fullSvg = `
       <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
         ${gradientSvg}
@@ -345,23 +423,29 @@ export class ImageCompositionService {
   static async composeImage(options: ComposeOptions): Promise<Buffer> {
     const { width, height } = ImageCompositionService.getDimensions(options.aspectRatio);
 
-    // 1. Prepare Base Background
+    // 1. Prepare Base Background (Procedural or AI Image - Zero pre-burned text)
     let baseSharp: sharp.Sharp;
 
-    // Check if preset is solomon_temple or jesus_embrace
-    const samplePresetPath = path.resolve(process.cwd(), 'client/public/presets/solomon_temple.jpg');
-    const sampleAltPath = path.resolve(process.cwd(), '../client/public/presets/solomon_temple.jpg');
-    const embracePresetPath = path.resolve(process.cwd(), 'client/public/presets/jesus_embrace.jpg');
-    const embraceAltPath = path.resolve(process.cwd(), '../client/public/presets/jesus_embrace.jpg');
-
-    if (options.background.value === 'jesus_embrace' && (fs.existsSync(embracePresetPath) || fs.existsSync(embraceAltPath))) {
-      const activePath = fs.existsSync(embracePresetPath) ? embracePresetPath : embraceAltPath;
-      baseSharp = sharp(activePath).resize(width, height, { fit: 'cover' });
-    } else if (options.background.value === 'solomon_temple' && (fs.existsSync(samplePresetPath) || fs.existsSync(sampleAltPath))) {
-      const activePath = fs.existsSync(samplePresetPath) ? samplePresetPath : sampleAltPath;
-      baseSharp = sharp(activePath).resize(width, height, { fit: 'cover' });
+    if (options.background.type === 'image' && options.background.value) {
+      if (options.background.value.startsWith('http://') || options.background.value.startsWith('https://')) {
+        try {
+          const fetchRes = await fetch(options.background.value);
+          const arrayBuf = await fetchRes.arrayBuffer();
+          baseSharp = sharp(Buffer.from(arrayBuf)).resize(width, height, { fit: 'cover' });
+        } catch {
+          const presetBuffer = ImageCompositionService.createPresetBackground('calvary_cross', width, height);
+          baseSharp = sharp(presetBuffer);
+        }
+      } else if (options.background.value.startsWith('data:image')) {
+        const base64Data = options.background.value.split(',')[1];
+        const imgBuffer = Buffer.from(base64Data, 'base64');
+        baseSharp = sharp(imgBuffer).resize(width, height, { fit: 'cover' });
+      } else {
+        const presetBuffer = ImageCompositionService.createPresetBackground(options.background.value || 'calvary_cross', width, height);
+        baseSharp = sharp(presetBuffer);
+      }
     } else if (options.background.type === 'preset') {
-      const presetBuffer = ImageCompositionService.createPresetBackground(options.background.value, width, height);
+      const presetBuffer = ImageCompositionService.createPresetBackground(options.background.value || 'calvary_cross', width, height);
       baseSharp = sharp(presetBuffer);
     } else if (options.background.type === 'color') {
       baseSharp = sharp({
@@ -372,31 +456,8 @@ export class ImageCompositionService {
           background: options.background.value || '#0B132B'
         }
       });
-    } else if (options.background.type === 'image' && options.background.value) {
-      if (options.background.value.startsWith('http://') || options.background.value.startsWith('https://')) {
-        // Fetch remote AI generated image (e.g. OpenAI DALL-E 3)
-        try {
-          const fetchRes = await fetch(options.background.value);
-          const arrayBuf = await fetchRes.arrayBuffer();
-          baseSharp = sharp(Buffer.from(arrayBuf)).resize(width, height, { fit: 'cover' });
-        } catch {
-          const presetBuffer = ImageCompositionService.createPresetBackground('heavenly_gold', width, height);
-          baseSharp = sharp(presetBuffer);
-        }
-      } else if (options.background.value.startsWith('data:image')) {
-        const base64Data = options.background.value.split(',')[1];
-        const imgBuffer = Buffer.from(base64Data, 'base64');
-        baseSharp = sharp(imgBuffer).resize(width, height, { fit: 'cover' });
-      } else if (options.background.value.includes('jesus_embrace') && fs.existsSync(embracePresetPath)) {
-        baseSharp = sharp(embracePresetPath).resize(width, height, { fit: 'cover' });
-      } else if (options.background.value.includes('solomon_temple') && fs.existsSync(samplePresetPath)) {
-        baseSharp = sharp(samplePresetPath).resize(width, height, { fit: 'cover' });
-      } else {
-        const presetBuffer = ImageCompositionService.createPresetBackground('deep_navy_gold', width, height);
-        baseSharp = sharp(presetBuffer);
-      }
     } else {
-      const presetBuffer = ImageCompositionService.createPresetBackground('heavenly_gold', width, height);
+      const presetBuffer = ImageCompositionService.createPresetBackground('calvary_cross', width, height);
       baseSharp = sharp(presetBuffer);
     }
 
